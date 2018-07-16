@@ -37,15 +37,19 @@ AM_CPPFLAGS = $(CORE_CPPFLAGS) \
 	-I$(srcdir)/../../cf-key \
 	-DTESTDATADIR='"$(srcdir)/data"'
 
-LDADD = ../../libpromises/libpromises.la libtest.la
+ENT_LIB = ../../../enterprise/libcfenterprise/libcfenterprise.la 
+ENT_AGENT_LIB = ../../../enterprise/libcfagent/libcfagent.la
+# LDADD = ../../../enterprise/libcfenterprise/libcfenterprise.la ../../libpromises/libpromises.la libtest.la ../../libutils/libutils.la 
+LDADD = $(ENT_LIB) libtest.la ../../libutils/libutils.la 
 
 # automake does not support "maude_LIBS" variables. We can only alter
 # the generic LIBS one. In case the functions are mocked in the test
 # implementation, then we are pretty sure that they will be overriden by
 # our local implementation. So we include *everything*...
 LIBS = $(CORE_LIBS)
-AM_LDFLAGS = $(CORE_LDFLAGS)
-
+# use linker option --allow-multiple-definition so we can override
+# functions in our tests that are already in other libraries we include.
+AM_LDFLAGS = $(CORE_LDFLAGS)  -Wl,--allow-multiple-definition
 
 check_LTLIBRARIES = libtest.la
 libtest_la_SOURCES = cmockery.c cmockery.h schema.h test.c test.h \
@@ -127,18 +131,11 @@ check_PROGRAMS = \
 	persistent_lock_test  \
 	thread_test \
 	package_versions_compare_test \
-	files_lib_test \
-	file_lib_test \
-	files_copy_test \
 	map_test \
-	parsemode_test \
 	parser_test \
-	passopenfile_test \
 	policy_test \
 	sort_test \
 	file_name_test \
-	logging_test \
-	logging_timestamp_test \
 	granules_test \
 	scope_test \
 	conversion_test \
@@ -146,28 +143,17 @@ check_PROGRAMS = \
 	refcount_test \
 	list_test \
 	buffer_test \
-	connection_management_test \
 	expand_test \
 	string_expressions_test \
 	var_expressions_test \
-	process_terminate_unix_test \
-	process_test \
-	exec-config-test \
 	generic_agent_test \
 	syntax_test \
-	sysinfo_test \
 	ipaddress_test \
 	rb-tree-test \
 	variable_test \
-	protocol_test \
-	mon_cpu_test \
-	mon_load_test \
-	mon_processes_test \
 	mustache_test \
 	class_test \
 	version_test \
-	hash_test \
-	key_test \
 	cf_upgrade_test \
 	queue_test \
 	stack_test \
@@ -177,9 +163,30 @@ check_PROGRAMS = \
 	addr_lib_test \
 	policy_server_test \
 	libcompat_test \
-	split_process_line_test \
 	new_packages_promise_test \
 	iteration_test
+
+if !NT
+check_PROGRAMS += \
+	file_lib_test \
+	files_copy_test \
+	passopenfile_test \
+	parsemode_test \
+	logging_test \
+	logging_timestamp_test \
+	connection_management_test \
+	process_terminate_unix_test \
+	process_test \
+	exec-config-test \
+	sysinfo_test \
+	protocol_test \
+	mon_cpu_test \
+	mon_load_test \
+	mon_processes_test \
+	hash_test \
+	key_test \
+	split_process_line_test
+endif
 
 if HAVE_AVAHI_CLIENT
 if HAVE_AVAHI_COMMON
@@ -238,7 +245,7 @@ if !BUILTIN_EXTENSIONS
 endif
 
 set_domainname_test_SOURCES = set_domainname_test.c
-set_domainname_test_LDADD = libstr.la ../../libpromises/libpromises.la
+set_domainname_test_LDADD = libstr.la ../../libpromises/libpromises.la $(ENT_LIB)
 
 str_test_SOURCES = str_test.c
 str_test_LDADD = libstr.la
@@ -258,11 +265,13 @@ buffer_test_SOURCES = buffer_test.c ../../libutils/buffer.c
 buffer_test_CPPFLAGS = $(AM_CPPFLAGS)
 
 csv_parser_test_SOURCES = csv_parser_test.c ../../libutils/csv_parser.c
-csv_parser_test_LDADD = libtest.la ../../libutils/libutils.la
+csv_parser_test_LDADD = libtest.la ../../libutils/libutils.la  $(ENT_LIB)
 
 regex_test_SOURCES = regex_test.c ../../libpromises/match_scope.c
 
 ipaddress_test_SOURCES = ipaddress_test.c
+
+if !NT
 
 protocol_test_SOURCES = protocol_test.c \
 	../../cf-serverd/server_common.c \
@@ -273,7 +282,9 @@ protocol_test_SOURCES = protocol_test.c \
 	../../cf-serverd/cf-serverd-functions.c \
 	../../cf-serverd/server_access.c \
 	../../cf-serverd/strlist.c
-protocol_test_LDADD = ../../libpromises/libpromises.la libtest.la
+protocol_test_LDADD = ../../libpromises/libpromises.la libtest.la 
+
+endif
 
 if HAVE_AVAHI_CLIENT
 if HAVE_AVAHI_COMMON
@@ -304,25 +315,25 @@ file_writer_test_SOURCES += gcov-stub.c
 endif
 
 db_test_SOURCES = db_test.c
-db_test_LDADD = libtest.la ../../libpromises/libpromises.la
+db_test_LDADD = libtest.la ../../libpromises/libpromises.la $(ENT_LIB)
 
 db_concurrent_test_SOURCES = db_concurrent_test.c
 #db_concurrent_test_CPPFLAGS = $(libdb_la_CPPFLAGS)
-db_concurrent_test_LDADD = libdb.la
+db_concurrent_test_LDADD = libdb.la $(ENT_LIB)
 
 lastseen_test_SOURCES = lastseen_test.c \
 	../../libpromises/item_lib.c \
 	../../libpromises/lastseen.c \
 	../../libutils/statistics.c
 #lastseen_test_CPPFLAGS = $(libdb_la_CPPFLAGS)
-lastseen_test_LDADD = libdb.la ../../libpromises/libpromises.la
+lastseen_test_LDADD = libdb.la ../../libpromises/libpromises.la $(ENT_LIB)
 
 lastseen_migration_test_SOURCES = lastseen_migration_test.c \
 	../../libpromises/lastseen.c \
 	../../libutils/statistics.c \
 	../../libpromises/item_lib.c
 #lastseen_migration_test_CPPFLAGS = $(libdb_la_CPPFLAGS)
-lastseen_migration_test_LDADD = libdb.la ../../libpromises/libpromises.la
+lastseen_migration_test_LDADD = libdb.la ../../libpromises/libpromises.la $(ENT_LIB)
 
 CLEANFILES = *.gcno *.gcda cfengine-enterprise.so
 
@@ -338,6 +349,9 @@ package_versions_compare_test_SOURCES = package_versions_compare_test.c \
 #package_versions_compare_test_CPPFLAGS = $(AM_CPPFLAGS)
 package_versions_compare_test_LDADD = ../../libpromises/libpromises.la \
 	libtest.la
+
+# TODO is there a corresponding file_lib for windows?
+if !NT
 
 file_lib_test_SOURCES = file_lib_test.c \
 	../../libutils/file_lib.c \
@@ -360,8 +374,12 @@ file_lib_test_CPPFLAGS = $(AM_CPPFLAGS) -DTEST_SYMLINK_ATOMICITY
 files_copy_test_SOURCES  = files_copy_test.c
 files_copy_test_LDADD    = libtest.la ../../libpromises/libpromises.la
 
+endif
+
 sort_test_SOURCES = sort_test.c
-sort_test_LDADD = libtest.la ../../libpromises/libpromises.la
+sort_test_LDADD = libtest.la ../../libpromises/libpromises.la $(ENT_LIB)
+
+if !NT
 
 logging_test_SOURCES = logging_test.c ../../libpromises/syslog_client.c
 logging_test_LDADD = libtest.la ../../libutils/libutils.la
@@ -377,14 +395,26 @@ connection_management_test_LDADD = ../../libpromises/libpromises.la \
 	 libtest.la \
 	../../cf-serverd/libcf-serverd.la
 
+endif
+
 rlist_test_SOURCES = rlist_test.c \
-	../../libpromises/rlist.c
-rlist_test_LDADD = libtest.la ../../libpromises/libpromises.la
+	../../libpromises/rlist.c \
+    ../../libutils/string_lib.c \
+    ../../libutils/regex.c
+#rlist_test_LDADD = libtest.la
+#rlist_test_LDADD = libtest.la  ../../libutils/libutils.la
+#rlist_test_LDADD = libtest.la  ../../../enterprise/libcfenterprise/libcfenterprise.la
+rlist_test_LDADD = libtest.la ../../libpromises/libpromises.la ../../../enterprise/libcfenterprise/libcfenterprise.la
+#rlist_test_LDADD = libtest.la ../../libpromises/libpromises.la
 # Workaround for object file basename conflicts, search the web for
 # "automake created with both libtool and without"
 rlist_test_CPPFLAGS = $(AM_CPPFLAGS)
 
+if !NT
+
 process_test_LDADD = libtest.la ../../libpromises/libpromises.la
+
+endif
 
 if LINUX
 
@@ -422,6 +452,8 @@ solaris_process_test_LDADD = libtest.la ../../libutils/libutils.la
 
 endif
 
+if !NT
+
 process_terminate_unix_test_SOURCES = process_terminate_unix_test.c \
 	../../libpromises/process_unix.c
 process_terminate_unix_test_LDADD = libtest.la ../../libutils/libutils.la
@@ -449,7 +481,12 @@ mon_processes_test_SOURCES = mon_processes_test.c \
 	../../cf-monitord/mon_processes.c
 mon_processes_test_LDADD = ../../libpromises/libpromises.la libtest.la
 
+endif
+
 version_test_SOURCES = version_test.c
+
+
+if !NT
 
 hash_test_SOURCES = hash_test.c
 hash_test_LDADD = ../../libutils/libutils.la libtest.la
