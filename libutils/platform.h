@@ -38,6 +38,10 @@
 
 #define _GNU_SOURCE 1
 
+#ifdef __MSYS__
+# include <_mingw.h>	/* to get __int64 type for openssl */
+//# define __MINGW32__ 1
+#endif
 #ifdef _WIN32
 # define MAX_FILENAME 227
 # define WINVER 0x501

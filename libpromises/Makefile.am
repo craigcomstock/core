@@ -150,11 +150,14 @@ libpromises_la_SOURCES = \
         verify_vars.c verify_vars.h \
         cf-windows-functions.h
 
-if !NT
-
+# for now, comment out. Figure out what to put for !NT in msys since NT is not defined
 libpromises_la_SOURCES += \
-        process_unix.c \
-        pipes_unix.c
+        process_unix_stub.c
+#if !NT
+#
+#libpromises_la_SOURCES += \
+#        process_unix.c \
+#        pipes_unix.c
 
 if LINUX
 libpromises_la_SOURCES += \
@@ -186,15 +189,15 @@ if !AIX
 if !HPUX
 if !SOLARIS
 if !FREEBSD
-libpromises_la_SOURCES += \
-        process_unix_stub.c
+#libpromises_la_SOURCES += \
+#        process_unix_stub.c
 endif
 endif
 endif
 endif
 endif
 
-endif # !NT
+#endif # !NT
 
 
 ########## Sources pre-generated and distributed in the tarball ##########
