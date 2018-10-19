@@ -13,6 +13,9 @@
 
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
 
+#ifdef __MINGW32__
+#error __MINGW32__ is defined
+#endif
 #include <string.h>
 #include <openssl/engine.h>
 #include <openssl/bn.h>                                         /* BN_* */

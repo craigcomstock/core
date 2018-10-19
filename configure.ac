@@ -1273,7 +1273,7 @@ case "$target_os" in
         ;;
    cygwin*)
         ;;
-   mingw*)
+   mingw*|msys*)
         ;;
    sco*)
         ;;
