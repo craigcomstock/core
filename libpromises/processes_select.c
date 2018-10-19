@@ -1665,7 +1665,12 @@ int LoadProcessTable()
     free(vbuff);
     return true;
 }
-# endif
+# else
+  int LoadProcessTable()
+  {
+    return false; // not implemented aka stub
+  }
+# endif // ifndef _WIN32
 
 void ClearProcessTable(void)
 {
