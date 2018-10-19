@@ -32,7 +32,7 @@ static char OVERRIDE_BINDIR[PATH_MAX] = {0};
 
 #if defined(__CYGWIN__) || defined(__ANDROID__)
 
-#define GET_DEFAULT_DIRECTORY_DEFINE(FUNC, GLOBAL)  \
+#define GET_DEFAULT_DIRECTORY_DEFINE(FUNC, GLOBAL) \
 static const char *GetDefault##FUNC##Dir(void)      \
 {                                                   \
     return GLOBAL;                                  \
@@ -81,7 +81,6 @@ const char *GetDefaultDir_helper(char dir[PATH_MAX], const char *root_dir, const
     }
 }
 
-#endif
 
 #define GET_DEFAULT_DIRECTORY_DEFINE(FUNC, STATIC, GLOBAL, FOLDER)  \
 const char *GetDefault##FUNC##Dir(void)                             \
@@ -90,6 +89,7 @@ const char *GetDefault##FUNC##Dir(void)                             \
     return GetDefaultDir_helper(STATIC##dir, GLOBAL, FOLDER);       \
 }                                                                   \
 
+
 GET_DEFAULT_DIRECTORY_DEFINE(Work, work, WORKDIR, NULL)
 GET_DEFAULT_DIRECTORY_DEFINE(Bin, bin, BINDIR, "bin")
 GET_DEFAULT_DIRECTORY_DEFINE(Log, log, LOGDIR, "log")
@@ -97,6 +97,7 @@ GET_DEFAULT_DIRECTORY_DEFINE(Pid, pid, PIDDIR, NULL)
 GET_DEFAULT_DIRECTORY_DEFINE(Master, master, MASTERDIR, "masterfiles")
 GET_DEFAULT_DIRECTORY_DEFINE(Input, input, INPUTDIR, "inputs")
 GET_DEFAULT_DIRECTORY_DEFINE(State, state, STATEDIR, "state")
+#endif
 
 /*******************************************************************/
 
