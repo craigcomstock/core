@@ -496,6 +496,8 @@ key_test_LDADD = ../../libpromises/libpromises.la \
 	../../libutils/libutils.la \
 	libtest.la
 
+endif
+
 strlist_test_SOURCES = strlist_test.c \
 	../../cf-serverd/strlist.c \
 	../../cf-serverd/strlist.h
