@@ -29,10 +29,11 @@ libenv_la_SOURCES = \
         time_classes.c time_classes.h \
         zones.c zones.h
 
-if !NT
-libenv_la_SOURCES += \
-	unix_iface.c
-endif
+# for now just comment this out, I am trying to build on windows, msys which does define NT but not _WIN32 or WIN32 in this context.
+#if !NT
+#libenv_la_SOURCES += \
+#	unix_iface.c
+#endif
 
 if SOLARIS
 libenv_la_LIBADD = -lkstat
