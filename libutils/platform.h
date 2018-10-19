@@ -48,7 +48,8 @@ extern int _snwprintf(wchar_t * __restrict__ _Dest, size_t _Count, const wchar_t
 #endif
 #ifdef _WIN32
 # define MAX_FILENAME 227
-# define WINVER 0x501
+//# define WINVER 0x501
+// TODO currently I am getting previous definition errors from this WINVER 0x501, it is defined in /usr/include/w32api/sdkddkver.h:162 WINVER _WIN32_WINNT
 # if defined(__CYGWIN__)
 #  undef FD_SETSIZE
 # endif
