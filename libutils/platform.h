@@ -38,8 +38,12 @@
 
 #define _GNU_SOURCE 1
 
-#ifdef __MSYS__
+#if defined(__MSYS__) || defined(__CYGWIN__)
+//# define STRSAFE_NO_DEPRECATE 1	/* for enterprise to have _snwprintf and maybe others? */
+# define NOCRYPT	/* to avoid collision between openssl and wincrypt.h */
 # include <_mingw.h>	/* to get __int64 type for openssl */
+# include <windows.h>   /* for enterprise? but maybe breaks other bits like core? */
+extern int _snwprintf(wchar_t * __restrict__ _Dest, size_t _Count, const wchar_t * __restrict__ _Format,...);
 //# define __MINGW32__ 1
 #endif
 #ifdef _WIN32

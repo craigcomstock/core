@@ -164,7 +164,7 @@ dnl ######################################################################
 AC_ARG_ENABLE([builtin-extensions], [AS_HELP_STRING([Build binaries with builtin extensions])],
               [],
               [
-                  AS_CASE([${target_os}], [mingw*], [enable_builtin_extensions=yes], [enable_builtin_extensions=no])
+                  AS_CASE([${target_os}], [mingw*|cygwin*], [enable_builtin_extensions=yes], [enable_builtin_extensions=no])
               ])
 AM_CONDITIONAL([BUILTIN_EXTENSIONS], [test "x$enable_builtin_extensions" = "xyes"])
 AS_IF([test "x$enable_builtin_extensions" = "xyes"], [AC_DEFINE([BUILTIN_EXTENSIONS], [1], [Define if you want builtin Enterprise extensions])])
