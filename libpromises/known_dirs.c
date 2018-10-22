@@ -48,7 +48,7 @@ GET_DEFAULT_DIRECTORY_DEFINE(Input, INPUTDIR)
 GET_DEFAULT_DIRECTORY_DEFINE(Master, MASTERDIR)
 GET_DEFAULT_DIRECTORY_DEFINE(State, STATEDIR)
 
-#elif !defined(__MINGW32__)
+#elif !defined(__MINGW32__) && !defined(__MSYS__)
 
 const char *GetDefaultDir_helper(char dir[PATH_MAX], const char *root_dir, const char *append_dir)
 {
@@ -81,7 +81,6 @@ const char *GetDefaultDir_helper(char dir[PATH_MAX], const char *root_dir, const
     }
 }
 
-#endif
 
 #define GET_DEFAULT_DIRECTORY_DEFINE(FUNC, STATIC, GLOBAL, FOLDER)  \
 const char *GetDefault##FUNC##Dir(void)                             \
@@ -98,6 +97,7 @@ GET_DEFAULT_DIRECTORY_DEFINE(Master, master, MASTERDIR, "masterfiles")
 GET_DEFAULT_DIRECTORY_DEFINE(Input, input, INPUTDIR, "inputs")
 GET_DEFAULT_DIRECTORY_DEFINE(State, state, STATEDIR, "state")
 
+#endif
 /*******************************************************************/
 
 const char *GetWorkDir(void)
