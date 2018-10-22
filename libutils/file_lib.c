@@ -227,7 +227,7 @@ bool IsAbsoluteFileName(const char *f)
  * MapName() is thread-safe, but the argument is modified. */
 
 #ifdef _WIN32
-# if defined(__MINGW32__)
+# if defined(__MINGW32__) || defined(__MSYS__)
 
 char *MapNameCopy(const char *s)
 {

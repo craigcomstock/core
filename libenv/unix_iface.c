@@ -58,7 +58,7 @@
 
 #define IPV6_PREFIX "ipv6_"
 
-#ifndef __MINGW32__
+#if !defined(__MINGW32__) && !defined(__MSYS__)
 
 # if defined(HAVE_STRUCT_SOCKADDR_SA_LEN) && !defined(__NetBSD__)
 #  ifdef _SIZEOF_ADDR_IFREQ

@@ -51,6 +51,10 @@
 # define MAX_FILENAME 254
 #endif
 
+#ifdef __MSYS__
+# include <_mingw.h>
+#endif
+
 #ifdef __MINGW32__
 # include <winsock2.h>
 # include <windows.h>

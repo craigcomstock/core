@@ -164,7 +164,7 @@ dnl ######################################################################
 AC_ARG_ENABLE([builtin-extensions], [AS_HELP_STRING([Build binaries with builtin extensions])],
               [],
               [
-                  AS_CASE([${target_os}], [mingw*], [enable_builtin_extensions=yes], [enable_builtin_extensions=no])
+                  AS_CASE([${target_os}], [mingw*|msys*], [enable_builtin_extensions=yes], [enable_builtin_extensions=no])
               ])
 AM_CONDITIONAL([BUILTIN_EXTENSIONS], [test "x$enable_builtin_extensions" = "xyes"])
 AS_IF([test "x$enable_builtin_extensions" = "xyes"], [AC_DEFINE([BUILTIN_EXTENSIONS], [1], [Define if you want builtin Enterprise extensions])])
@@ -1246,6 +1246,7 @@ AC_CONFIG_FILES([configure_flags.env])
 dnl ######################################################################
 dnl OS specific stuff
 dnl ######################################################################
+windows_nt = "no"
 
 case "$target_os" in
 
@@ -1281,9 +1282,10 @@ case "$target_os" in
         ;;
    sysv4.2MP|unix_sv*)
         ;;
-   cygwin*)
-        ;;
-   mingw*)
+   cygwin*|mingw*|msys*)
+        windows_nt = "yes"
+	CPPFLAGS="$CPPFLAGS -mwin32 -I/usr/include -I/mingw64/include"
+	LDFLAGS="$LDFLAGS -L/usr/lib -L/mingw64/lib"
         ;;
    sco*)
         ;;
@@ -1293,6 +1295,7 @@ case "$target_os" in
         AC_MSG_ERROR(Unknown system type $target_os)
         ;;
 esac
+AM_CONDITIONAL([NT], [test x$windows_nt = xyes])
 
 m4_include([m4/cf3_platforms.m4])
 

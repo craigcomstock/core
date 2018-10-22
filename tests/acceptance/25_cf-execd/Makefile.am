@@ -37,6 +37,9 @@ AM_CFLAGS = \
 	$(OPENSSL_CFLAGS) \
 	$(ENTERPRISE_CFLAGS)
 
+print-%:
+	@echo '$*=$($*)'
+
 if !NT
 noinst_PROGRAMS = cf-execd-test
 
