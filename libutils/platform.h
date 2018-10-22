@@ -42,9 +42,10 @@
 //# define STRSAFE_NO_DEPRECATE 1	/* for enterprise to have _snwprintf and maybe others? */
 # define NOCRYPT	/* to avoid collision between openssl and wincrypt.h */
 # include <_mingw.h>	/* to get __int64 type for openssl */
-# include <windows.h>   /* for enterprise? but maybe breaks other bits like core? */
+/* maybe don't include windows.h here since we are changing all subsequent ifdefs around __MINGW32__ to ifdef _WIN32*/
+//# include <windows.h>   /* for enterprise? but maybe breaks other bits like core? */
 extern int _snwprintf(wchar_t * __restrict__ _Dest, size_t _Count, const wchar_t * __restrict__ _Format,...);
-//# define __MINGW32__ 1
+//# define _WIN32 1
 #endif
 #ifdef _WIN32
 # define MAX_FILENAME 227
@@ -60,7 +61,7 @@ extern int _snwprintf(wchar_t * __restrict__ _Dest, size_t _Count, const wchar_t
 # define MAX_FILENAME 254
 #endif
 
-#ifdef __MINGW32__
+#ifdef _WIN32
 /* make sure that NOCRYPT is set to avoid collision between openssl and wincrypt.h such as X509_NAME, OCSP_RESPONSE and others */
 #define NOCRYPT
 # include <winsock2.h>
@@ -190,7 +191,7 @@ struct utsname
 
 #include <signal.h>
 
-#ifdef __MINGW32__
+#ifdef _WIN32
 # define LOG_LOCAL0      (16<<3)
 # define LOG_LOCAL1      (17<<3)
 # define LOG_LOCAL2      (18<<3)
@@ -211,7 +212,7 @@ struct utsname
 // that is very badly supported in MinGW ATM.
 ULONGLONG WINAPI GetTickCount64(void);
 
-#else /* !__MINGW32__ */
+#else /* !_WIN32 */
 # include <syslog.h>
 #endif
 
@@ -355,7 +356,7 @@ void globfree(glob_t *pglob);
 # include <sys/resource.h>
 #endif
 
-#ifndef __MINGW32__
+#ifndef _WIN32
 # include <pwd.h>
 # include <grp.h>
 #endif
@@ -375,7 +376,7 @@ union mpinfou
 };
 #endif
 
-#ifndef __MINGW32__
+#ifndef _WIN32
 # include <sys/socket.h>
 # include <sys/ioctl.h>
 # include <net/if.h>
@@ -533,7 +534,7 @@ int clock_gettime(clockid_t clock_id, struct timespec *tp);
      *
      * @TODO what we need is a resolvepath(2) cross-platform implementation.
      */
-#    if defined (__MINGW32__)
+#    if defined (_WIN32)
 #        define realpath(N,R) _fullpath((R), (N), PATH_MAX)
 #    endif
 #endif
@@ -758,7 +759,7 @@ double log2(double x);
 /*  Windows                                                        */
 /*******************************************************************/
 
-#ifdef __MINGW32__
+#ifdef _WIN32
 # define MAXHOSTNAMELEN 256     // always adequate: http://msdn.microsoft.com/en-us/library/ms738527(VS.85).aspx
 
 // as seen in in_addr struct in winsock.h
@@ -796,7 +797,7 @@ struct timespec
 };
 # endif/* NOT _TIMESPEC_DEFINED */
 
-#endif /* __MINGW32__ */
+#endif /* _WIN32 */
 
 #ifndef ERESTARTSYS
 # define ERESTARTSYS EINTR
@@ -1013,7 +1014,7 @@ struct timespec
 # define O_TEXT 0
 #endif
 
-#if defined(__MINGW32__)
+#if defined(_WIN32)
 /* _mkdir(3) */
 # include <direct.h>
 #endif
