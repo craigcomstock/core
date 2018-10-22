@@ -1296,6 +1296,7 @@ case "$target_os" in
         ;;
 esac
 AM_CONDITIONAL([NT], [test x$windows_nt = xyes])
+AS_IF([test "$NT" -eq 1], [AC_DEFINE([NT], [1], [Define if NT windows API is to be used.])])
 
 m4_include([m4/cf3_platforms.m4])
 
