@@ -53,6 +53,7 @@
 
 #ifdef __MSYS__
 # include <_mingw.h>
+# include <wtypes.h>	/* for HKEY (registry), SECURITY_DESCRIPTOR (win_acl_...) */
 #endif
 
 #ifdef __MINGW32__

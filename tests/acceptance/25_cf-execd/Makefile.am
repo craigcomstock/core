@@ -40,10 +40,10 @@ AM_CFLAGS = \
 print-%:
 	@echo '$*=$($*)'
 
-if !NT
-noinst_PROGRAMS = cf-execd-test
-
-cf_execd_test_SOURCES = cf-execd-rpl-functions.c
-cf_execd_test_LDADD = ../../../cf-execd/libcf-execd-test.la
-
-endif
+#if !NT
+#noinst_PROGRAMS = cf-execd-test
+#
+#cf_execd_test_SOURCES = cf-execd-rpl-functions.c
+#cf_execd_test_LDADD = ../../../cf-execd/libcf-execd-test.la
+#
+#endif
