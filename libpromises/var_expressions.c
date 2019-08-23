@@ -345,7 +345,7 @@ VarRef *VarRefParseFromNamespaceAndScope(const char *qualified_name,
  */
 bool is_this_not_special(const char *scope, const char *lval) {
     // TODO: better way to get this list?
-    const char *special_this_variables[] = {"v","k","this","service_policy","promiser","promiser_uid","promiser_gid","promiser_pid","promiser_ppid","bundle","handle","namespace","promise_filename","promise_dirname","promise_linenumber", NULL};
+  const char *special_this_variables[] = {"v","k","this","service_policy","promiser","promiser_uid","promiser_gid","promiser_pid","promiser_ppid","bundle","handle","namespace","promise_filename","promise_dirname","promise_linenumber", "file_filename", "file_dirname", NULL};
 
     if (!scope) {
         return false;
