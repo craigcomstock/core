@@ -1416,6 +1416,9 @@ void EvalContextStackPushPromiseFrame(EvalContext *ctx, const Promise *owner)
         DeleteSlash(path);
         ChopLastNode(path);
 
+        // SHUCKS/TODO: this is about where we could put file_dirname and file_filename
+        // but above and the method makes me think this is only for promises somehow. :(
+        // Where else is EvalContextVariablePutSpecial()? Maybe put that someplace higher up? Like when loading the context/file initially?
         EvalContextVariablePutSpecial(ctx, SPECIAL_SCOPE_THIS, "promise_dirname", path, CF_DATA_TYPE_STRING, "source=promise");
         char number[PRINTSIZE(uintmax_t)];
         xsnprintf(number, CF_SMALLBUF, "%ju", (uintmax_t) owner->offset.line);
