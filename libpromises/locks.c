@@ -579,12 +579,14 @@ static void RvalDigestUpdate(EVP_MD_CTX *context, Rlist *rp)
     switch (rp->val.type)
     {
     case RVAL_TYPE_SCALAR:
+        printf("RvalDigestUpdate, RVAL_TYPE_SCALAR, rp=%s\n", RlistScalarValue(rp));
         EVP_DigestUpdate(context, RlistScalarValue(rp),
                          strlen(RlistScalarValue(rp)));
         break;
 
     case RVAL_TYPE_FNCALL:
         // TODO: This should be recursive and not just hash the function name
+        printf("RvalDigestUpdate, RVAL_TYPE_FNCALL, name=%s\n", RlistFnCallValue(rp)->name);
         EVP_DigestUpdate(context, RlistFnCallValue(rp)->name,
                          strlen(RlistFnCallValue(rp)->name));
         break;
@@ -601,12 +603,14 @@ void PromiseRuntimeHash(const Promise *pp, const char *salt,
 {
     static const char PACK_UPIFELAPSED_SALT[] = "packageuplist";
 
+    printf("PromiseRuntimeHash, pp=%p, salt=%s\n", pp, salt);
+    
     int md_len;
     const EVP_MD *md = NULL;
     Rlist *rp;
     FnCall *fp;
 
-    char *noRvalHash[] = { "mtime", "atime", "ctime", NULL };
+    char *noRvalHash[] = { "mtime", "atime", "ctime", "stime_range", "ttime_range", NULL };
     int doHash;
 
     md = HashDigestFromId(type);
@@ -668,6 +672,8 @@ void PromiseRuntimeHash(const Promise *pp, const char *salt,
         {
             Constraint *cp = SeqAt(pp->conlist, i);
 
+            printf("PromiseRuntimeHash, constraint lval=%s\n", cp->lval);
+
             EVP_DigestUpdate(context, cp->lval, strlen(cp->lval));
 
             // don't hash rvals that change (e.g. times)
@@ -690,10 +696,12 @@ void PromiseRuntimeHash(const Promise *pp, const char *salt,
             switch (cp->rval.type)
             {
             case RVAL_TYPE_SCALAR:
+                printf("PromiseRuntimeHash, constraint RVAL_TYPE_SCALAR rval.item=%s\n", cp->rval.item);
                 EVP_DigestUpdate(context, cp->rval.item, strlen(cp->rval.item));
                 break;
 
             case RVAL_TYPE_LIST:
+              printf("PromiseRuntimeHash, constraint RVAL_TYPE_LIST\n");
                 for (rp = cp->rval.item; rp != NULL; rp = rp->next)
                 {
                     RvalDigestUpdate(context, rp);
@@ -701,11 +709,11 @@ void PromiseRuntimeHash(const Promise *pp, const char *salt,
                 break;
 
             case RVAL_TYPE_FNCALL:
-
                 /* Body or bundle */
 
                 fp = (FnCall *) cp->rval.item;
-
+                printf("PromiseRuntimeHash, constraint RVAL_TYPE_FNCALL, name=%s\n", fp->name);
+                
                 EVP_DigestUpdate(context, fp->name, strlen(fp->name));
 
                 for (rp = fp->args; rp != NULL; rp = rp->next)
@@ -721,6 +729,12 @@ void PromiseRuntimeHash(const Promise *pp, const char *salt,
     }
 
     EVP_DigestFinal(context, digest, &md_len);
+
+    char promise_hash[(2 * CF_SHA256_LEN) + 1];
+    StringBytesToHex(promise_hash, sizeof(promise_hash), digest, CF_SHA256_LEN);
+
+    printf("PromiseRuntimeHash, promise_hash=%s\n", promise_hash);
+    
     EVP_MD_CTX_free(context);
 
 /* Digest length stored in md_len */
