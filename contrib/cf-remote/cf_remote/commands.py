@@ -239,6 +239,42 @@ def list_platforms():
         print(key)
     return 0
 
+def list_spawned():
+    # todo refactor this bit here which I copied from destroy()
+    if os.path.exists(CLOUD_CONFIG_FPATH):
+        creds_data = read_json(CLOUD_CONFIG_FPATH)
+    else:
+        print("Cloud credentials not found at %s" % CLOUD_CONFIG_FPATH)
+        return 1
+
+    creds = AWSCredentials(creds_data["aws"]["key"], creds_data["aws"]["secret"])
+
+    if not os.path.exists(CLOUD_STATE_FPATH):
+        print("No saved cloud state info")
+        return 1
+    vms_info = read_json(CLOUD_STATE_FPATH)
+    for group_name in [key for key in vms_info.keys() if key.startswith("@")]:
+#        print("group_name=%s" % group_name)
+        region = vms_info[group_name]["meta"]["region"]
+        driver = get_cloud_driver(Providers.AWS, creds, region)
+        
+        for name, vm_info in vms_info[group_name].items():
+#            print("name=%s" % name)
+            if name == "meta":
+                continue
+            # first element is package name but we don't know about that
+            # last extra element is active/inactive
+            vm_uuid = vm_info["uuid"]
+            vm = VM.get_by_uuid(vm_uuid, driver)
+            print("PACKAGES_JUNK,%s,%s,%s,%s,%s,%s" % (
+                name,
+                vm_info["public_ips"][0],
+                vm_info["platform"],
+                vm_info["private_ips"][0],
+                vm_info["uuid"],
+                (vm is not None)
+            ))
+
 def init_cloud_config():
     if os.path.exists(CLOUD_CONFIG_FPATH):
         print("File %s already exists" % CLOUD_CONFIG_FPATH)
