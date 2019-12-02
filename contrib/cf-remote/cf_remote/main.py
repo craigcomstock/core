@@ -69,12 +69,12 @@ def get_args():
     sp.add_argument("--platform", help="Platform to use", type=str)
     sp.add_argument("--count", help="How many hosts to spawn", type=int)
     sp.add_argument("--role", help="Role of the hosts", choices=["hub", "hubs", "client", "clients"])
-    sp.add_argument("--name", help="Name of the group of hosts (can be used in other commands)")
+    sp.add_argument("--name", help="Name of the group of hosts (can be used with spawn/destroy commands)")
     # TODO: --provider, --region (both optional)
 
     dp = subp.add_parser("destroy", help="Destroy hosts spawned in the clouds")
     dp.add_argument("--all", help="Destroy all hosts spawned in the clouds", action='store_true')
-    dp.add_argument("name", help="Name fo the group of hosts to destroy", nargs='?')
+    dp.add_argument("name", help="Name of the group of hosts to destroy", nargs='?')
 
     args = ap.parse_args()
     return args

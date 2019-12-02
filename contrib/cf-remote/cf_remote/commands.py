@@ -125,7 +125,7 @@ def spawn(platform, count, role, group_name, provider=Providers.AWS, region=None
     if os.path.exists(CLOUD_CONFIG_FPATH):
         creds_data = read_json(CLOUD_CONFIG_FPATH)
     else:
-        print("Cloud credentials not found at %s" % CLOUD_CONFIG_FPATH)
+        print("Cloud credentials not found at %s. Run `cf-remote spawn --init-config` to create an empty config to fill out." % CLOUD_CONFIG_FPATH)
         return 1
 
     if os.path.exists(CLOUD_STATE_FPATH):
