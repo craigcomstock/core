@@ -64,6 +64,7 @@ def get_args():
 
     sp = subp.add_parser("spawn", help="Spawn hosts in the clouds")
     sp.add_argument("--list-platforms", help="List supported platforms", action='store_true')
+    sp.add_argument("--list-spawned", help="List spawned hosts", action='store_true')
     sp.add_argument("--init-config", help="Initialize configuration file for spawn functionality",
                     action='store_true')
     sp.add_argument("--platform", help="Platform to use", type=str)
@@ -110,6 +111,9 @@ def run_command_with_args(command, args):
         elif args.init_config:
             commands.init_cloud_config()
             return
+        if args.list_spawned:
+            commands.list_spawned()
+            return
         # else
         if args.role.endswith("s"):
             # role should be singular
@@ -148,7 +152,7 @@ def validate_command(command, args):
                 "--package cannot be used in combination with --hub-package / --client-package")
             # TODO: Find this automatically
 
-    if command == "spawn" and not args.list_platforms and not args.init_config:
+    if command == "spawn" and not args.list_platforms and not args.init_config and not args.list_spawned:
         # --list-platforms doesn't require any other options/arguments (TODO:
         # --provider), but otherwise all have to be given
         if not args.platform:
