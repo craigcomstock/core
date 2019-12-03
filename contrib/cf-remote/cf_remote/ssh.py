@@ -16,7 +16,7 @@ def connect(host, users=None):
         if not users:
             users = [parts[0]]
     if not users:
-        users = ["Administrator", "ubuntu", "ec2-user", "centos", "vagrant", "root"]
+        users = ["Administrator", "ubuntu", "ec2-user", "centos", "vagrant", "root", "admin"]
         # Similar to ssh, try own username first,
         # some systems will lock us out if we have too many failed attempts.
         if whoami() not in users:
@@ -27,9 +27,17 @@ def connect(host, users=None):
             c = fabric.Connection(host=host, user=user)
             c.ssh_user = user
             c.ssh_host = host
-            c.run("whoami", hide=True)
-            return c
+            if user != "Administrator":
+                log.debug("Attempting whoami call")
+                c.run("whoami", hide=True)
+                return c
+            else:
+                return c
         except AuthenticationException:
+            continue
+        except:
+            e = sys.exc_info()[0]
+            print("error: {}".format(e))
             continue
     sys.exit("Could not ssh into '{}'".format(host))
 
@@ -63,7 +71,11 @@ def ssh_cmd(connection, cmd, errors=False):
     assert connection
     try:
         log.debug("Running over SSH: '{}'".format(cmd))
-        result = connection.run(cmd, hide=True)
+        # https://docs.fabfile.org/en/2.4/api/connection.html
+        # http://docs.pyinvoke.org/en/latest/api/runners.html#invoke.runners.Runner.run
+        # But here, for windows, we need to check for either $? or %errorlevel% depending on version :(
+        # TODO make a wrapper (which this is really) and deal with different windows versions :)
+        result = connection.run(cmd, hide=True, warn=True)
         output = result.stdout.replace("\r\n", "\n").strip("\n")
         log.debug("'{}' -> '{}'".format(cmd, output))
         return output

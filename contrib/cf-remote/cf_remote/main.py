@@ -65,6 +65,7 @@ def get_args():
     sp = subp.add_parser("spawn", help="Spawn hosts in the clouds")
     sp.add_argument("--list-platforms", help="List supported platforms", action='store_true')
     sp.add_argument("--list-spawned", help="List spawned hosts", action='store_true')
+    sp.add_argument("--install-spawned", help="Install spawned hosts", action='store_true') # todo provide group and version parameters
     sp.add_argument("--init-config", help="Initialize configuration file for spawn functionality",
                     action='store_true')
     sp.add_argument("--platform", help="Platform to use", type=str)
@@ -75,7 +76,7 @@ def get_args():
 
     dp = subp.add_parser("destroy", help="Destroy hosts spawned in the clouds")
     dp.add_argument("--all", help="Destroy all hosts spawned in the clouds", action='store_true')
-    dp.add_argument("name", help="Name of the group of hosts to destroy", nargs='?')
+    dp.add_argument("name", help="Name of the group of hosts to destroy", nargs='*')
 
     args = ap.parse_args()
     return args
@@ -111,7 +112,10 @@ def run_command_with_args(command, args):
         elif args.init_config:
             commands.init_cloud_config()
             return
-        if args.list_spawned:
+        elif args.install_spawned:
+            commands.install_spawned() # todo group_name and version args
+            return
+        elif args.list_spawned:
             commands.list_spawned()
             return
         # else
@@ -120,7 +124,7 @@ def run_command_with_args(command, args):
             args.role = args.role[:-1]
         commands.spawn(args.platform, args.count, args.role, args.name)
     elif command == "destroy":
-        # args.name is a list because of 'nargs=1'
+        # args.name is a list because of 'nargs=*'
         group_name = args.name[0] if args.name else None
         commands.destroy(group_name)
     else:
@@ -152,7 +156,8 @@ def validate_command(command, args):
                 "--package cannot be used in combination with --hub-package / --client-package")
             # TODO: Find this automatically
 
-    if command == "spawn" and not args.list_platforms and not args.init_config and not args.list_spawned:
+    # TODO refine this so not so sprawly :(
+    if command == "spawn" and not args.install_spawned and not args.list_platforms and not args.init_config and not args.list_spawned:
         # --list-platforms doesn't require any other options/arguments (TODO:
         # --provider), but otherwise all have to be given
         if not args.platform:

@@ -275,6 +275,59 @@ def list_spawned():
                 (vm is not None)
             ))
 
+# TODO have group_name parameter so only try to install a particular group/type            
+def install_spawned():
+    # TODO --force if already installed?
+    # todo refactor this bit here which I copied from destroy()
+    if os.path.exists(CLOUD_CONFIG_FPATH):
+        creds_data = read_json(CLOUD_CONFIG_FPATH)
+    else:
+        print("Cloud credentials not found at %s" % CLOUD_CONFIG_FPATH)
+        return 1
+
+    creds = AWSCredentials(creds_data["aws"]["key"], creds_data["aws"]["secret"])
+
+#    HUB_IPS = []
+    HUBS = [] # only need HUBS since we don't know the username so leave it out of the install_hosts() call
+    CLIENTS = []
+    VERSION = "3.12.3" # TODO param in cloud_state.json?
+    
+    if not os.path.exists(CLOUD_STATE_FPATH):
+        print("No saved cloud state info")
+        return 1
+    vms_info = read_json(CLOUD_STATE_FPATH)
+    for group_name in [key for key in vms_info.keys() if key.startswith("@")]:
+#        print("group_name=%s" % group_name)
+        region = vms_info[group_name]["meta"]["region"]
+        driver = get_cloud_driver(Providers.AWS, creds, region)
+        
+        for name, vm_info in vms_info[group_name].items():
+#            print("name=%s" % name)
+            if name == "meta":
+                continue
+            if "hub" in name: # todo this is where group would come in right? except group not in name
+                continue
+            # first element is package name but we don't know about that
+            # last extra element is active/inactive
+            vm_uuid = vm_info["uuid"]
+            vm = VM.get_by_uuid(vm_uuid, driver)
+
+            if "hub" in name:
+                HUBS.append("admin@{}".format(vm_info["public_ips"][0]))
+            if "client" in name:
+                CLIENTS.append(vm_info["public_ips"][0])
+
+    print("HUBS={}".format(HUBS))
+    print("CLIENTS={}".format(CLIENTS))
+
+    install(HUBS,
+            CLIENTS,
+            bootstrap=HUBS,
+            hub_package="/home/craig/Downloads/cfengine-nova-hub_3.12.3-1_amd64.deb",
+            client_package="/home/craig/Downloads/cfengine-nova-3.12.3-x86_64.msi",
+            demo=True,
+            call_collect=True)
+
 def init_cloud_config():
     if os.path.exists(CLOUD_CONFIG_FPATH):
         print("File %s already exists" % CLOUD_CONFIG_FPATH)

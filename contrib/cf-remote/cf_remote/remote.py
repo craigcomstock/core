@@ -80,11 +80,15 @@ def get_info(host, *, users=None, connection=None):
     user, host = connection.ssh_user, connection.ssh_host
     data = OrderedDict()
     data["ssh_user"] = user
+    log.debug("user={}".format(user))
     data["ssh_host"] = host
     data["ssh"] = "{}@{}".format(user, host)
-    data["whoami"] = ssh_cmd(connection, "whoami")
-    systeminfo = ssh_cmd(connection, "systeminfo")
-    if systeminfo:
+    if user != "Administrator":
+        data["whoami"] = ssh_cmd(connection, "whoami")
+    # problem with the systeminfo call here is that 2008 echo $? doesn't work so paramiko always fails :(
+    # can warn_only=True work? What about on unix hosts? :(
+    if user == "Administrator":
+        systeminfo = ssh_cmd(connection, "systeminfo")
         data["os"] = "windows"
         data["systeminfo"] = parse_systeminfo(systeminfo)
         data["package_tags"] = ["x86_64", "msi"]
@@ -121,6 +125,7 @@ def install_package(host, pkg, data, *, connection=None):
     if ".deb" in pkg:
         output = ssh_sudo(connection, "dpkg -i {}".format(pkg), True)
     elif ".msi" in pkg:
+#        output = ssh_cmd(connection, r"msiexec /qn /i .\{} /L*v .\install.log".format(pkg), True)
         output = ssh_cmd(connection, r".\{}".format(pkg), True)
         time.sleep(8)
     else:
