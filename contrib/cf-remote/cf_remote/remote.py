@@ -124,7 +124,9 @@ def install_package(host, pkg, data, *, connection=None):
         output = ssh_cmd(connection, r".\{}".format(pkg), True)
         time.sleep(8)
     else:
-        output = ssh_sudo(connection, "rpm -i {}".format(pkg), True)
+        # todo, if cfengine already there maybe do `rpm -U` instead of `rpm -i`
+        # for now workaround is always use `yum install` since it "just works"
+        output = ssh_sudo(connection, "yum install -y {}".format(pkg), True)
     if output is None:
         sys.exit("Installation failed on '{}'".format(host))
 
