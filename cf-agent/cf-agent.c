@@ -633,7 +633,9 @@ static GenericAgentConfig *CheckOpts(int argc, char **argv)
 // If -f is specified then we should load that forth file
 // otherwise enter interactive mode!!! What a bonus!!! :p
 // TODO, how the heck to get pforth .a files into cf-agent??? autoconf yo!
-                char IfInit = 0;
+//                char IfInit = 0;
+// Or rather Force INit mode
+char IfInit = 1; // TRUE
                 const char *DicName = NULL;
                 const char *SourceName = NULL;
                 pfMessage("\ncf-forth\n");
