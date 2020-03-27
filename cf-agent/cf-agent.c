@@ -88,6 +88,8 @@
 #include <sys/types.h>                  /* checking umask on writing setxid log */
 #include <sys/stat.h>                   /* checking umask on writing setxid log */
 
+#include "pforth.h" /* cf-forth */
+
 #include <mod_common.h>
 
 #ifdef HAVE_AVAHI_CLIENT_CLIENT_H
@@ -201,6 +203,7 @@ static const struct option OPTIONS[] =
     {"show-evaluated-vars", optional_argument, 0, 0 },
     {"skip-bootstrap-policy-run", no_argument, 0, 0 },
     {"skip-db-check", optional_argument, 0, 0 },
+    {"forth", optional_argument, 0, 0 },
     {NULL, 0, 0, '\0'}
 };
 
@@ -621,6 +624,20 @@ static GenericAgentConfig *CheckOpts(int argc, char **argv)
             else if (StringSafeEqual(option_name, "skip-bootstrap-policy-run"))
             {
                 config->agent_specific.agent.bootstrap_trigger_policy = false;
+            }
+            else if (StringSafeEqual(option_name, "forth"))
+            {
+// TODO, likely we want to set a FLAG here for running forth
+// and not just START the interpreter.
+// So that we can init various things BEFORE policy is run
+// If -f is specified then we should load that forth file
+// otherwise enter interactive mode!!! What a bonus!!! :p
+// TODO, how the heck to get pforth .a files into cf-agent??? autoconf yo!
+                char IfInit = 0;
+                const char *DicName = NULL;
+                const char *SourceName = NULL;
+                pfMessage("\ncf-forth\n");
+                return pfDoForth( DicName, SourceName, IfInit);
             }
             else if (StringSafeEqual(option_name, "skip-db-check"))
             {

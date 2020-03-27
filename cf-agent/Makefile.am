@@ -26,6 +26,7 @@ noinst_LTLIBRARIES = libcf-agent.la
 AM_CPPFLAGS = -I$(srcdir)/../libpromises -I$(srcdir)/../libntech/libutils \
 	-I$(srcdir)/../libcfnet \
 	-I$(srcdir)/../cf-check \
+        -I$(srcdir)/../contrib/cf-forth/pforth/csrc \
 	@CPPFLAGS@ \
 	$(ENTERPRISE_CPPFLAGS) \
 	$(OPENSSL_CPPFLAGS) \
@@ -133,7 +134,8 @@ bin_PROGRAMS = cf-agent
 cf_agent_CFLAGS = $(AM_CFLAGS)
 
 # Build both a libcf-agent.la library, and a cf-agent executable
-cf_agent_LDADD = libcf-agent.la
+cf_agent_LDADD = libcf-agent.la  \
+ ../contrib/cf-forth/pforth/build/unix/pforth.a
 endif
 
 CLEANFILES = *.gcno *.gcda
