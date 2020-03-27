@@ -116,6 +116,9 @@ static Policy *g_policy; /* GLOBAL_P */
 static EvalContext *g_ctx; /* GLOBAL_P */
 static GenericAgentConfig *g_config; /* GLOBAL_P */
 
+static Promise *g_promise; /* GLOBAL_P */
+static PromiseType *g_promise_type; /* GLOBAL_P */
+static Bundle *g_bundle; /* GLOBAL_P */
 static const Rlist *ACCESSLIST = NULL; /* GLOBAL_P */
 
 static int CFA_BACKGROUND = 0; /* GLOBAL_X */
@@ -287,8 +290,11 @@ int main(int argc, char *argv[])
     BeginAudit();
 
     if ( FORTH ) {
-        const char *DicName = NULL; // maybe specify the -f file given at command line!!!
-        char IfInit = true;
+//        const char *DicName = NULL; // maybe specify the -f file given at command line!!!
+const char *DicName = "pforth.dic";
+//        char IfInit = true;
+// for using pforth.dic, IfInit should be false
+  char IfInit = false;
         const char *SourceName = NULL;
         pfMessage("\ncf-forth starting\n");
         g_policy = policy;
@@ -2164,21 +2170,39 @@ static cell_t CPromise( cell_t Val )
 // see core/tests/unit/expand_test.c:395 test_expand_promise_array_with_scalar_arg()
 // maybe BundleToString(Writer *writer, Bundle *bundle)
 // nay, PolicyToString(const Policy *policy, Writer *writer)
-static cell_t CPolicy2String( cell_t Val )
+static cell_t CPolicyString( cell_t Val )
 {
-  MSG_NUM_D("CPolicy2String: Val = ", Val);
+  MSG_NUM_D("CPolicyString: Val = ", Val);
   Writer *w = StringWriter();
   PolicyToString(g_policy, w);
   printf("%s\n", StringWriterData(w));
   WriterClose(w);
   return Val+1;
 }
+static cell_t CPolicyNew( cell_t Val ) {
+MSG_NUM_D("CPolicyNew: Val = ", Val);
+g_policy = PolicyNew();
+Bundle *bundle = PolicyAppendBundle(g_policy, NamespaceDefault(), "main", "agent", NULL, NULL);
+PromiseType *promise_type = BundleAppendPromiseType(bundle, "reports");
+Promise *promise = PromiseTypeAppendPromise(promise_type, "hi", (Rval) { NULL, RVAL_TYPE_NOPROMISEE }, "any", NULL);
+printf("promise = %p\n", promise); // just to use the variable :p
+// what if I switched these two? push promisetypeframe THEN bundleframe?
+EvalContextStackPushBundleFrame(g_ctx, bundle, NULL, false);
+EvalContextStackPushPromiseTypeFrame(g_ctx, promise_type);
+return Val+1;
+
+//ExpandPromise(g_ctx, promise, acutator_expand_promise_array_with_scalar_arg, NULL); // TODO, certainly wrong yeah?
+//EvalContextStackPopFrame(g_ctx);
+//EvalContextStackPopFrame(g_ctx);
+
+}
 
 // TODO, make this conditional somehow on FORTH being defined as an option?
 CFunc0 CustomFunctionTable[] = 
 {
   (CFunc0) CPromise,
-  (CFunc0) CPolicy2String
+  (CFunc0) CPolicyString,
+  (CFunc0) CPolicyNew
 };
 Err CompileCustomFunctions( void )
 {
@@ -2186,7 +2210,9 @@ Err CompileCustomFunctions( void )
   int i = 0;
   err = CreateGlueToC( "PROMISE", i++, C_RETURNS_VALUE, 1);
   if (err < 0 ) return err;
-  err = CreateGlueToC( "POLICY", i++, C_RETURNS_VALUE, 1);
+  err = CreateGlueToC( "POLICYSTRING", i++, C_RETURNS_VALUE, 1);
+  if (err < 0) return err;
+  err = CreateGlueToC( "POLICYNEW", i++, C_RETURNS_VALUE, 1);
   if (err < 0) return err;
   return 0;
 }
