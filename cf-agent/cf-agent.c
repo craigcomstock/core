@@ -89,6 +89,7 @@
 #include <sys/stat.h>                   /* checking umask on writing setxid log */
 
 #include "pforth.h" /* cf-forth */
+#include "pf_all.h" /* so I can add custom words */
 
 #include <mod_common.h>
 
@@ -110,6 +111,10 @@ static bool ALWAYS_VALIDATE = false; /* GLOBAL_P */
 static bool CFPARANOID = false; /* GLOBAL_P */
 static bool PERFORM_DB_CHECK = false;
 static bool FORTH = false;
+// hack to get these three global so I can have a pforth word "promise"
+static Policy *g_policy; /* GLOBAL_P */
+static EvalContext *g_ctx; /* GLOBAL_P */
+static GenericAgentConfig *g_config; /* GLOBAL_P */
 
 static const Rlist *ACCESSLIST = NULL; /* GLOBAL_P */
 
@@ -286,6 +291,9 @@ int main(int argc, char *argv[])
         char IfInit = true;
         const char *SourceName = NULL;
         pfMessage("\ncf-forth starting\n");
+        g_policy = policy;
+        g_ctx = ctx;
+        g_config = config;
         return pfDoForth( DicName, SourceName, IfInit);
     } // FORTH
 
@@ -2143,3 +2151,24 @@ static int AutomaticBootstrap(ARG_UNUSED GenericAgentConfig *config)
 }
 
 #endif // Avahi
+
+static cell_t CPromise( cell_t Val )
+{
+  MSG_NUM_D("CPromise: Val = ", Val);
+  KeepPromises(g_ctx, g_policy, g_config);
+  return Val+1;
+}
+
+// TODO, make this conditional somehow on FORTH being defined as an option?
+CFunc0 CustomFunctionTable[] = 
+{
+  (CFunc0) CPromise
+};
+Err CompileCustomFunctions( void )
+{
+  Err err;
+  int i = 0;
+  err = CreateGlueToC( "PROMISE", i++, C_RETURNS_VALUE, 1);
+  if (err < 0 ) return err;
+  return 0;
+}
