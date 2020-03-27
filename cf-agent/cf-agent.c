@@ -2152,17 +2152,33 @@ static int AutomaticBootstrap(ARG_UNUSED GenericAgentConfig *config)
 
 #endif // Avahi
 
+// cf-forth C function hooks
 static cell_t CPromise( cell_t Val )
 {
   MSG_NUM_D("CPromise: Val = ", Val);
   KeepPromises(g_ctx, g_policy, g_config);
   return Val+1;
 }
+// Bundle *bp = PolicyAppendBundle( policy, "default", "none", "agent", NULL, NULL);
+// PolicyDestroy(policy)
+// see core/tests/unit/expand_test.c:395 test_expand_promise_array_with_scalar_arg()
+// maybe BundleToString(Writer *writer, Bundle *bundle)
+// nay, PolicyToString(const Policy *policy, Writer *writer)
+static cell_t CPolicy2String( cell_t Val )
+{
+  MSG_NUM_D("CPolicy2String: Val = ", Val);
+  Writer *w = StringWriter();
+  PolicyToString(g_policy, w);
+  printf("%s\n", StringWriterData(w));
+  WriterClose(w);
+  return Val+1;
+}
 
 // TODO, make this conditional somehow on FORTH being defined as an option?
 CFunc0 CustomFunctionTable[] = 
 {
-  (CFunc0) CPromise
+  (CFunc0) CPromise,
+  (CFunc0) CPolicy2String
 };
 Err CompileCustomFunctions( void )
 {
@@ -2170,5 +2186,7 @@ Err CompileCustomFunctions( void )
   int i = 0;
   err = CreateGlueToC( "PROMISE", i++, C_RETURNS_VALUE, 1);
   if (err < 0 ) return err;
+  err = CreateGlueToC( "POLICY", i++, C_RETURNS_VALUE, 1);
+  if (err < 0) return err;
   return 0;
 }
