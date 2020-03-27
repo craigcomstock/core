@@ -109,6 +109,7 @@ static bool ALLCLASSESREPORT = false; /* GLOBAL_P */
 static bool ALWAYS_VALIDATE = false; /* GLOBAL_P */
 static bool CFPARANOID = false; /* GLOBAL_P */
 static bool PERFORM_DB_CHECK = false;
+static bool FORTH = false;
 
 static const Rlist *ACCESSLIST = NULL; /* GLOBAL_P */
 
@@ -279,6 +280,15 @@ int main(int argc, char *argv[])
     ConnCache_Init();
 
     BeginAudit();
+
+    if ( FORTH ) {
+        const char *DicName = NULL; // maybe specify the -f file given at command line!!!
+        char IfInit = true;
+        const char *SourceName = NULL;
+        pfMessage("\ncf-forth starting\n");
+        return pfDoForth( DicName, SourceName, IfInit);
+    } // FORTH
+
     KeepPromises(ctx, policy, config);
 
     if (EvalAborted(ctx))
@@ -627,19 +637,7 @@ static GenericAgentConfig *CheckOpts(int argc, char **argv)
             }
             else if (StringSafeEqual(option_name, "forth"))
             {
-// TODO, likely we want to set a FLAG here for running forth
-// and not just START the interpreter.
-// So that we can init various things BEFORE policy is run
-// If -f is specified then we should load that forth file
-// otherwise enter interactive mode!!! What a bonus!!! :p
-// TODO, how the heck to get pforth .a files into cf-agent??? autoconf yo!
-//                char IfInit = 0;
-// Or rather Force INit mode
-char IfInit = 1; // TRUE
-                const char *DicName = NULL;
-                const char *SourceName = NULL;
-                pfMessage("\ncf-forth\n");
-                return pfDoForth( DicName, SourceName, IfInit);
+                FORTH = true;
             }
             else if (StringSafeEqual(option_name, "skip-db-check"))
             {
