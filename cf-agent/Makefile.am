@@ -22,11 +22,12 @@
 # included file COSL.txt.
 #
 noinst_LTLIBRARIES = libcf-agent.la
+#PFORTH_C = $(srcdir)/../contrib/cf-forth/pforth/csrc
+
 
 AM_CPPFLAGS = -I$(srcdir)/../libpromises -I$(srcdir)/../libntech/libutils \
 	-I$(srcdir)/../libcfnet \
 	-I$(srcdir)/../cf-check \
-        -I$(srcdir)/../contrib/cf-forth/pforth/csrc \
 	@CPPFLAGS@ \
 	$(ENTERPRISE_CPPFLAGS) \
 	$(OPENSSL_CPPFLAGS) \
