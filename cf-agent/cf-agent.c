@@ -213,6 +213,7 @@ static const struct option OPTIONS[] =
     {"skip-bootstrap-policy-run", no_argument, 0, 0 },
     {"skip-db-check", optional_argument, 0, 0 },
     {"forth", optional_argument, 0, 0 },
+    {"forth-init", optional_argument, 0, 0 },
     {NULL, 0, 0, '\0'}
 };
 
@@ -292,9 +293,8 @@ int main(int argc, char *argv[])
     if ( FORTH ) {
 //        const char *DicName = NULL; // maybe specify the -f file given at command line!!!
 const char *DicName = "pforth.dic";
-//        char IfInit = true;
 // for using pforth.dic, IfInit should be false
-  char IfInit = true;
+  char IfInit = false;
         const char *SourceName = NULL;
         pfMessage("\ncf-forth starting\n");
         g_policy = policy;
@@ -648,6 +648,12 @@ static GenericAgentConfig *CheckOpts(int argc, char **argv)
             else if (StringSafeEqual(option_name, "skip-bootstrap-policy-run"))
             {
                 config->agent_specific.agent.bootstrap_trigger_policy = false;
+            }
+            else if (StringSafeEqual(option_name, "forth-init"))
+            {
+                pfMessage("\ncompiling pforth.dic\n");
+                return pfDoForth( NULL, "system.fth", 1);
+                // do some init stuff and exit
             }
             else if (StringSafeEqual(option_name, "forth"))
             {
