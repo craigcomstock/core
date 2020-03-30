@@ -30,6 +30,7 @@
 
 #include <logging.h>
 #include <sequence.h>
+#include "generic_agent.h"
 
 
 Promise *DeRefCopyPromise(EvalContext *ctx, const Promise *pp);
@@ -38,6 +39,17 @@ void PromiseRef(LogLevel level, const Promise *pp);
 void CopyBodyConstraintsToPromise(EvalContext *ctx, Promise *pp,
                                   const Body *bp);
 const char *PromiseID(const Promise *pp);
+
+// hack to get these three global so I can have a pforth word "promise"
+static Policy *g_policy; /* GLOBAL_P */
+static EvalContext *g_ctx; /* GLOBAL_P */
+static GenericAgentConfig *g_config; /* GLOBAL_P */
+
+static Promise *g_promise; /* GLOBAL_P */
+static PromiseType *g_promise_type; /* GLOBAL_P */
+static Bundle *g_bundle; /* GLOBAL_P */
+
+extern void KeepPromises(EvalContext *ctx, const Policy *policy, GenericAgentConfig *config);
 
 
 #endif
