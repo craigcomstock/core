@@ -3,4 +3,5 @@
 	url = https://github.com/cfengine/libntech
 [submodule "contrib/cf-forth/pforth"]
 	path = contrib/cf-forth/pforth
-	url = git@github.com:philburk/pforth.git
+	url = git@github.com:craigcomstock/pforth
+	branch = cf-forth
