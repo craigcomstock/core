@@ -1,0 +1,12 @@
+bundle agent main
+{
+  files:
+    "/home/craig/motd.txt"
+    create => "true",
+    edit_line => addmessage;
+}
+bundle edit_line addmessage
+{
+  insert_lines:
+    "yep! I'm here!";
+}
