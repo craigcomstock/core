@@ -112,6 +112,7 @@ static bool CFPARANOID = false; /* GLOBAL_P */
 static bool PERFORM_DB_CHECK = false;
 static bool FORTH = false;
 // hack to get these three global so I can have a pforth word "promise"
+extern Policy *g_policy;
 //static Policy *g_policy; /* GLOBAL_P */
 //static EvalContext *g_ctx; /* GLOBAL_P */
 //static GenericAgentConfig *g_config; /* GLOBAL_P */
@@ -296,10 +297,14 @@ const char *DicName = "pforth.dic";
 // for using pforth.dic, IfInit should be false
   char IfInit = false;
         const char *SourceName = NULL;
+printf("policy = %p\n", policy);
+printf("g_policy = %p\n", g_policy);
         pfMessage("\ncf-forth starting\n");
         g_policy = policy;
         g_ctx = ctx;
         g_config = config;
+printf("policy = %p\n", policy);
+printf("g_policy = %p\n", g_policy);
         return pfDoForth( DicName, SourceName, IfInit);
     } // FORTH
 
