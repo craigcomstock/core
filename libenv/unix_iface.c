@@ -148,7 +148,7 @@ static void GetMacAddress(EvalContext *ctx, ARG_UNUSED int fd, struct ifreq *ifr
       return;
     }
 
-# if defined(SIOCGIFHWADDR) && defined(HAVE_STRUCT_IFREQ_IFR_HWADDR)
+# if defined(SIOCGIFHWADDR) && defined(HAVE_STRUCT_IFREQ_IFR_HWADDR) && !defined(__TERMUX__)
     char hw_mac[CF_MAXVARSIZE];
 
     if ((ioctl(fd, SIOCGIFHWADDR, ifr) == -1))
@@ -180,9 +180,8 @@ static void GetMacAddress(EvalContext *ctx, ARG_UNUSED int fd, struct ifreq *ifr
 
 # elif defined(HAVE_GETIFADDRS) && !defined(__sun)
     char hw_mac[CF_MAXVARSIZE];
-    char *m;
+    char *mac_pointer, *mac_allocd;
     struct ifaddrs *ifaddr, *ifa;
-    struct sockaddr_dl *sdl;
 
     if (getifaddrs(&ifaddr) == -1)
     {
@@ -197,33 +196,59 @@ static void GetMacAddress(EvalContext *ctx, ARG_UNUSED int fd, struct ifreq *ifr
     {
         if ( strcmp(ifa->ifa_name, ifp->ifr_name) == 0)
         {
+            if (ifa->ifa_addr == NULL)
+            {
+               Log(LOG_LEVEL_VERBOSE, "Interface '%s' has no address information", ifa->ifa_name);
+               continue;
+            }
+#if AF_LINK
             if (ifa->ifa_addr->sa_family == AF_LINK)
             {
                 sdl = (struct sockaddr_dl *)ifa->ifa_addr;
-                m = (char *) LLADDR(sdl);
-
-                snprintf(hw_mac, sizeof(hw_mac), "%.2x:%.2x:%.2x:%.2x:%.2x:%.2x",
-                    (unsigned char) m[0],
-                    (unsigned char) m[1],
-                    (unsigned char) m[2],
-                    (unsigned char) m[3],
-                    (unsigned char) m[4],
-                    (unsigned char) m[5]);
-
-                EvalContextVariablePutSpecial(ctx, SPECIAL_SCOPE_SYS, name, hw_mac, CF_DATA_TYPE_STRING, "source=agent");
-                if (!RlistContainsString(*hardware, hw_mac))
-                {
-                    RlistAppend(hardware, hw_mac, RVAL_TYPE_SCALAR);
-                }
-                RlistAppend(interfaces, ifa->ifa_name, RVAL_TYPE_SCALAR);
-
-                snprintf(name, sizeof(name), "mac_%s", CanonifyName(hw_mac));
-                EvalContextClassPutHard(ctx, name, "source=agent");
+                mac_pointer = (char *) LLADDR(sdl);
             }
+#elif AF_PACKET
+            if (ifa->ifa_addr->sa_family == AF_PACKET)
+            {
+                struct sockaddr_ll sll = (struct sockaddr_ll *)ifa->ifa_addr;
+                mac_allocd = xmalloc(sll->sll_halen);
+                memcpy(mac_allocd, sll->sll_addr, sll->sll_halen);
+                mac_pointer = mac_allocd;
+            }
+#else
+# error "AF_LINK or AF_PACKET must be available for GetMacAddress() currently"
+#endif
+            if (mac_pointer == NULL)
+            {
+                Log(LOG_LEVEL_ERROR, "getifaddrs() did not return Physical-layer address");
+                continue;
+            }
+
+            snprintf(hw_mac, sizeof(hw_mac), "%.2x:%.2x:%.2x:%.2x:%.2x:%.2x",
+                (unsigned char) mac_pointer[0],
+                (unsigned char) mac_pointer[1],
+                (unsigned char) mac_pointer[2],
+                (unsigned char) mac_pointer[3],
+                (unsigned char) mac_pointer[4],
+                (unsigned char) mac_pointer[5]);
+
+            EvalContextVariablePutSpecial(ctx, SPECIAL_SCOPE_SYS, name, hw_mac, CF_DATA_TYPE_STRING, "source=agent");
+            if (!RlistContainsString(*hardware, hw_mac))
+            {
+                RlistAppend(hardware, hw_mac, RVAL_TYPE_SCALAR);
+            }
+            RlistAppend(interfaces, ifa->ifa_name, RVAL_TYPE_SCALAR);
+
+            snprintf(name, sizeof(name), "mac_%s", CanonifyName(hw_mac));
+            EvalContextClassPutHard(ctx, name, "source=agent");
         }
 
     }
     freeifaddrs(ifaddr);
+    if (mac_allocd != NULL)
+    {
+        free(mac_allocd);
+    }
 
 # elif defined(_AIX) && !defined(HAVE_GETIFADDRS)
     char hw_mac[CF_MAXVARSIZE];
