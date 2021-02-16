@@ -1,0 +1,6 @@
+{
+  "classes":
+  {
+    "services_autorun": ["any::"]
+  }
+}
