@@ -1,0 +1,16 @@
+###############################################################################
+#
+# bundle agent main
+#  - User/Site policy entry
+#
+###############################################################################
+
+bundle agent main
+# User Defined Service Catalogue
+{
+  methods:
+    # Activate your custom policies here
+  reports:
+    "$(this.bundle) reporting from $(this.promise_dirname)$(const.dirsep)$(this.promise_filename)";
+
+}

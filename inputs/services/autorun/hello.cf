@@ -1,0 +1,8 @@
+bundle agent hello_world_autorun
+{
+  meta:
+    "tags" slist => { "autorun" };
+
+  reports:
+    "$(this.bundle) reporting from $(this.promise_filename)";
+}

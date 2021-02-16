@@ -1,0 +1,135 @@
+body common control
+{
+  bundlesequence => {
+# not def, too much baggage
+#    def,
+    services_autorun,
+    @(services_autorun.bundles),
+#    main,
+#    @(def.bundlsequence_end),
+  };
+  inputs => {
+# more def, don't do it
+# no need for controls, no daemons for non-priv right?
+#    @(cfengine_controls.def_inputs),
+#    @(cfengine_controls.inputs),
+    @(cfengine_stdlib.inputs),
+    @(services_autorun.inputs),
+#    "services/main.cf",
+  };
+}
+# copied from MPF/promises.cf :(
+bundle common cfengine_stdlib
+# @brief Include the standard library
+{
+  vars:
+
+    any::
+      "inputs" slist => { "$(sys.local_libdir)/stdlib.cf" };
+
+
+      # As part of ENT-2719 3.12.2 introduced package_method attributes for
+      # specifying the interpreter and specifying the module path. These
+      # attributes are not known in previous versions and must not be seen by
+      # the parser or they will be seen as syntax errors. A cleaner way to do
+      # this using the minimum_version macro is possible, but that would break
+      # masterfiles compatibility in 3.12 with 3.7 binaries since 3.7 binaries
+      # do not support major.minor.patch with minimum_version, only major.minor.
+
+    windows.cfengine_3_12.!(cfengine_3_12_0|cfengine_3_12_1)::
+      "inputs" slist => { "$(sys.local_libdir)/stdlib.cf",
+                          "$(sys.local_libdir)/packages-ENT-3719.cf" };
+@if minimum_version(3.14)
+    windows::
+      "inputs" slist => { "$(sys.local_libdir)/stdlib.cf",
+                          "$(sys.local_libdir)/packages-ENT-3719.cf" };
+@endif
+
+  reports:
+    verbose_mode::
+      "$(this.bundle): defining inputs='$(inputs)'";
+}
+
+bundle common cfengine_controls
+# @brief Include various agent control policies
+{
+  vars:
+
+      "def_inputs"
+        slist => {
+                   "controls/def.cf",
+                   "controls/def_inputs.cf",
+                 },
+        comment => "We strictly order the def inputs because they should be parsed first";
+
+
+      "input[cf_agent]"
+        string => "controls/cf_agent.cf",
+        comment => "Agent control options";
+
+      "input[cf_execd]"
+        string => "controls/cf_execd.cf",
+        comment => "Executor (scheduler) control options";
+
+      "input[cf_monitord]"
+        string => "controls/cf_monitord.cf",
+        comment => "Monitor/Measurement control options";
+
+      "input[cf_serverd]"
+        string => "controls/cf_serverd.cf",
+        comment => "Server control options";
+
+      "input[cf_runagent]"
+        string => "controls/cf_runagent.cf",
+        comment => "Runagent (remote activation request) control options";
+
+    enterprise_edition::
+
+      "input[cf_hub]" -> { "CFEngine Enterprise" }
+        string => "controls/cf_hub.cf",
+        comment => "Hub (agent report collection) control options";
+
+      "input[reports]" -> { "CFEngine Enterprise" }
+        string => "controls/reports.cf",
+        comment => "Report collection options";
+
+    any::
+
+      "inputs" slist => getvalues(input);
+
+  reports:
+    DEBUG|DEBUG_cfengine_controls::
+      "DEBUG $(this.bundle)";
+        "$(const.t)defining inputs='$(inputs)'";
+}
+
+bundle common services_autorun
+# @brief Include autorun policy and discover autorun bundles if enabled
+{
+  vars:
+    services_autorun::
+      "inputs" slist => { "$(sys.local_libdir)/autorun.cf" };
+      "found_inputs" slist => lsdir("$(this.promise_dirname)/services/autorun", ".*\.cf", "true");
+      "bundles" slist => { "autorun" }; # run loaded bundles
+
+    !services_autorun::
+      # If services_autorun is not enabled, then we should not extend inputs
+      # automatically.
+      "inputs" slist => { };
+      "found_inputs" slist => {};
+      "bundles" slist => { "services_autorun" }; # run self
+
+  reports:
+    DEBUG|DEBUG_services_autorun::
+      "DEBUG $(this.bundle): Services Autorun Disabled"
+        if => "!services_autorun";
+
+      "DEBUG $(this.bundle): Services Autorun Enabled"
+        if => "services_autorun";
+
+      "DEBUG $(this.bundle): adding input='$(inputs)'"
+        if => isvariable("inputs");
+
+      "DEBUG $(this.bundle): adding input='$(found_inputs)'"
+        if => isvariable("found_inputs");
+}
