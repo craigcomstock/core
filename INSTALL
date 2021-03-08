@@ -131,5 +131,6 @@ See docs/BSD.md
 
 * Termux (2020-04-24)
 
-# pkg install build-essential autoconf automake bison flex liblmdb openssl pcre libacl
-# ./autogen.sh --without-pam
+ pkg install -y build-essential autoconf automake bison flex liblmdb openssl pcre libacl libyaml
+ ./autogen.sh --without-pam --with-libyaml
+more complete instructions and how the cfengine community package is built can be found at https://github.com/termux/termux-packages/blob/master/packages/cfengine/build.sh
