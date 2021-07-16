@@ -2,6 +2,17 @@
 
 This is a small perl script to help you locate and display bodies or bundles inside of your masterfiles.  It uses ANSI color sequences.
 
+Dependencies:
+
+```sh
+$ perl -MCPAN -e shell
+cpan[1]> install File::HomeDir
+```
+
+If perl and/or modules are not desired or possible, see cf-locate.sh in masterfiles repo under misc directory for a lighter weight alternative.
+
+Usage:
+
 It takes optional `-f` or `--full`; or `-p` or `--plain` flags first,
 then a pattern, then a list of directories.
 
@@ -53,3 +64,4 @@ body classes always(x)
       repair_timeout => { "$(x)" };
 }
 ```
+
