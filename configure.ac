@@ -1697,6 +1697,12 @@ else
   AM_CONDITIONAL([ENABLE_COVERAGE], false)
 fi
 
+if test -d ../masterfiles/lib/stdlib.cf; then
+  run_acceptance_tests=yes
+else
+  run_acceptance_tests=no
+fi
+
 #
 # Populate contents of config.post.h
 #
