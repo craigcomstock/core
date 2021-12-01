@@ -24,6 +24,7 @@
 
 
 #include <generic_agent.h>
+#include <syslog.h>
 
 #include <bootstrap.h>
 #include <policy_server.h>
@@ -969,7 +970,7 @@ bool GenericAgentArePromisesValid(const GenericAgentConfig *config)
 #if !defined(__MINGW32__)
 static void OpenLog(int facility)
 {
-    openlog(NULL, LOG_PID | LOG_NOWAIT | LOG_ODELAY, facility);
+//    openlog(NULL, LOG_NOWAIT, facility);
 }
 #endif
 
@@ -2160,8 +2161,8 @@ void SetupSignalsForAgent(void)
 {
     signal(SIGINT, HandleSignalsForAgent);
     signal(SIGTERM, HandleSignalsForAgent);
-    signal(SIGBUS, HandleSignalsForAgent);
-    signal(SIGHUP, SIG_IGN);
+//    signal(SIGBUS, HandleSignalsForAgent);
+//    signal(SIGHUP, SIG_IGN);
     signal(SIGPIPE, SIG_IGN);
     signal(SIGUSR1, HandleSignalsForAgent);
     signal(SIGUSR2, HandleSignalsForAgent);
