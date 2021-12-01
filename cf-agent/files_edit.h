@@ -28,6 +28,7 @@
 #include <cf3.defs.h>
 #include <file_lib.h>
 
+#undef HAVE_LIBXML2
 #ifdef HAVE_LIBXML2
 #include <libxml/parser.h>
 #include <libxml/xpathInternals.h>

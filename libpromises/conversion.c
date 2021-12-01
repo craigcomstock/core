@@ -236,20 +236,20 @@ int SignalFromString(const char *s)
 
     switch (i)
     {
-    case cfa_hup:
-        return SIGHUP;
+//    case cfa_hup:
+//        return SIGHUP;
     case cfa_int:
         return SIGINT;
-    case cfa_trap:
-        return SIGTRAP;
+//    case cfa_trap:
+//        return SIGTRAP;
     case cfa_kill:
         return SIGKILL;
     case cfa_pipe:
         return SIGPIPE;
     case cfa_cont:
         return SIGCONT;
-    case cfa_abrt:
-        return SIGABRT;
+//    case cfa_abrt:
+//        return SIGABRT;
     case cfa_stop:
         return SIGSTOP;
     case cfa_quit:
@@ -262,10 +262,10 @@ int SignalFromString(const char *s)
         return SIGUSR1;
     case cfa_usr2:
         return SIGUSR2;
-    case cfa_bus:
-        return SIGBUS;
-    case cfa_segv:
-        return SIGSEGV;
+//    case cfa_bus:
+//        return SIGBUS;
+//    case cfa_segv:
+//        return SIGSEGV;
     default:
         return -1;
     }
