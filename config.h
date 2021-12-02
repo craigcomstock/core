@@ -81,7 +81,7 @@
 /* #undef HAVE_CLOSEFROM */
 
 /* Define to 1 if you have the <curl/curl.h> header file. */
-#define HAVE_CURL_CURL_H 1
+#define HAVE_CURL_CURL_H 0
 
 /* Define to 1 if you have the declaration of `alarm', and to 0 if you don't.
    */
@@ -485,10 +485,10 @@
 /* #undef HAVE_LIBKSTAT */
 
 /* Define to 1 if you have the `lmdb' library (-llmdb). */
-#define HAVE_LIBLMDB 1
+#define HAVE_LIBLMDB 0
 
 /* Define to 1 if you have the `m' library (-lm). */
-#define HAVE_LIBM 1
+#define HAVE_LIBM 0
 
 /* Define to 1 if you have the `mysqlclient' library (-lmysqlclient). */
 /* #undef HAVE_LIBMYSQLCLIENT */
@@ -518,7 +518,7 @@
 /* #undef HAVE_LIBSEC */
 
 /* Define to 1 if you have the `ssl' library (-lssl). */
-#define HAVE_LIBSSL 1
+#define HAVE_LIBSSL 0
 
 /* Define to 1 if you have the `systemd' library (-lsystemd). */
 /* #undef HAVE_LIBSYSTEMD */
@@ -527,19 +527,19 @@
 /* #undef HAVE_LIBTOKYOCABINET */
 
 /* Define to 1 if you have the `virt' library (-lvirt). */
-#define HAVE_LIBVIRT 1
+#define HAVE_LIBVIRT 0
 
 /* Define to 1 if you have the <libvirt/libvirt.h> header file. */
 #define HAVE_LIBVIRT_LIBVIRT_H 1
 
 /* Define to 1 if you have the `xml2' library (-lxml2). */
-#define HAVE_LIBXML2 1
+#define HAVE_LIBXML2 0
 
 /* Define to 1 if you have the <libxml/xmlwriter.h> header file. */
 #define HAVE_LIBXML_XMLWRITER_H 1
 
 /* Define to 1 if you have the `yaml' library (-lyaml). */
-#define HAVE_LIBYAML 1
+#define HAVE_LIBYAML 0
 
 /* Define to 1 if you have the `llistxattr' function. */
 #define HAVE_LLISTXATTR 1
@@ -638,7 +638,7 @@
 /* #undef HAVE_ORTENTRY */
 
 /* Define to 1 if you have the <pcre.h> header file. */
-#define HAVE_PCRE_H 1
+#define HAVE_PCRE_H 0
 
 /* Define to 1 if you have the <pcre/pcre.h> header file. */
 /* #undef HAVE_PCRE_PCRE_H */
