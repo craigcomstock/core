@@ -242,7 +242,8 @@ static const char *const HINTS[] =
 
 /*******************************************************************/
 
-int main(int argc, char *argv[])
+// s/main/cfagent_&/ for nuttx
+int cfagent_main(int argc, char *argv[])
 {
     SetupSignalsForAgent();
 #ifdef HAVE_LIBXML2
