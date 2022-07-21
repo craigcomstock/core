@@ -83,24 +83,11 @@ SHELL
 shopt -s expand_aliases
 export MAKEFLAGS="-j -l#{os_cpu_cores}"
 alias make='make -j -l#{os_cpu_cores}'
-export BUILD_TYPE=DEBUG
-export NO_CONFIGURE=1
-export PROJECT=community
+source ./buildscripts/env-community-agent.sh
 cd /cfe
 ./buildscripts/build-scripts/autogen
 yum -q -y remove libtool libtool-ltdl
-./buildscripts/build-scripts/clean-buildmachine
-./buildscripts/build-scripts/build-environment-check
-./buildscripts/build-scripts/install-dependencies
-./buildscripts/build-scripts/configure
-./buildscripts/build-scripts/compile
-./buildscripts/build-scripts/package
-rm -rf /var/cfengine
-export TEST_MACHINE=chroot
-./buildscripts/build-scripts/clean-buildmachine
-./buildscripts/build-scripts/build-environment-check
-./buildscripts/build-scripts/install-dependencies
-./buildscripts/build-scripts/test
+bash -x ./buildscripts/build-community-agent.sh
 SHELL
   end
 end
