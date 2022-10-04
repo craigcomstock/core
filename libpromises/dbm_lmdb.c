@@ -610,6 +610,10 @@ DBPriv *DBPrivOpenDB(const char *const dbpath, const dbid id)
                 dbpath, mdb_strerror(rc));
             goto err;
         }
+        else
+        {
+            assert(rc != EINVAL);
+        }
 #if HAVE_DECL_SCHED_YIELD && defined(HAVE_SCHED_YIELD)
         // Not required for this to work, but makes it less likely that the race
         // condition will persist.
@@ -621,6 +625,7 @@ DBPriv *DBPrivOpenDB(const char *const dbpath, const dbid id)
     {
         Log(LOG_LEVEL_ERR, "Could not open database txn %s: %s",
             dbpath, mdb_strerror(rc));
+        assert(0);
         goto err;
     }
     rc = mdb_open(txn, NULL, 0, &db->dbi);
