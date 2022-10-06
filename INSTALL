@@ -140,7 +140,12 @@ $ ./autogen.sh --without-pam
 $ pkg install build-essential git autoconf automake bison flex liblmdb openssl pcre libacl libyaml
 $ ./autogen.sh --without-pam
 
-* OSX (2021-10-20)
+* OSX (2022-10-07)
 
 $ brew install openssl@1.1 lmdb autoconf automake libtool bison flex pcre m4 gcc make
 $ ./autogen.sh --enable-debug --with-openssl="$(brew --prefix openssl@1.1)"
+
+or
+
+$ sudo port install openssl lmdb autoconf automake libtool bison flex pcre m4 make
+$ CPPFLAGS=-I/opt/local/include LDFLAGS=-L/opt/local/lib ./autogen.sh --enable-debug
