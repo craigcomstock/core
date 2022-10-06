@@ -1,0 +1,2 @@
+sudo cp cfe /usr/local/bin/
+sudo chmod +x /usr/local/bin/cfe

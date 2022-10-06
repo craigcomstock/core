@@ -1,4 +1,11 @@
 #!/usr/bin/env sh
+set -x
+set -e
+if [ "$1" = "run" -o -z "$1" ]; then
+  sudo /var/cfengine/bin/cf-agent -KIf update.cf
+  sudo /var/cfengine/bin/cf-agent -KI
+  exit 0
+fi
 if [ "$1" = "uninstall" ]; then
   echo "uninstalling CFEngine..."
   systemctl stop cfengine3
@@ -18,3 +25,13 @@ fi
 
 echo "usage: $0 <subcommand>"
 echo "  subcommands: uninstall"
+# commands todo
+bootstrap
+hosts report
+inventory report
+health info status
+license status
+dashboard
+compliance scores
+policy analyzer
+recent not kept promises
