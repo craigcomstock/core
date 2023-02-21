@@ -238,6 +238,7 @@ else
 fi
 
 # first, collect basic information about the system
+log_cmd "date" # to capture when this report was generated
 log_cmd "uname -a"
 log_cmd "$BINDIR/cf-promises -V"
 
