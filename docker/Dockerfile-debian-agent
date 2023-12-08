@@ -1,0 +1,7 @@
+FROM debian:latest
+RUN apt-get update
+RUN apt-get install -y wget
+RUN rm -rf /var/lib/apt/lists/*
+RUN wget https://s3.amazonaws.com/cfengine.packages/quick-install-cfengine-enterprise.sh
+RUN bash quick-install-cfengine-enterprise.sh agent
+#CMD [ "/sbin/init" ]

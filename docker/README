@@ -1,0 +1,23 @@
+Here we have Dockerfiles to build images which we publish to hub.docker.com
+
+# agent
+
+This is a minimal image, around 14MB, which includes
+- alpine:latest
+- cfengine
+- cfengine-masterfiles
+
+Run with
+
+```
+docker run -it cfengine/agent /bin/sh
+cf-agent -IB $(hostname -i)
+cf-agent -KIf update.cf
+cf-agent -KI
+```
+
+Or just run your policy directly by mapping a local directory to /var/lib/cfengine/inputs
+
+```
+docker run -i cfengine/agent -v ${pwd}:/var/lig/cfengine/inputs /usr/bin/cf-agent -KI
+```

@@ -1,0 +1,8 @@
+FROM ubuntu:22.04
+RUN apt-get update \
+  && apt-get install -y wget \
+  && rm -rf /var/lib/apt/lists/* \
+  && wget https://s3.amazonaws.com/cfengine.packages/quick-install-cfengine-enterprise.sh \
+  && bash quick-install-cfengine-enterprise.sh agent \
+  && cp -a /var/cfengine/masterfiles /var/cfengine/inputs
+CMD [ "/var/cfengine/bin/cf-agent -KI" ]
