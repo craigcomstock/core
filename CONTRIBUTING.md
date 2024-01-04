@@ -78,7 +78,16 @@ See: [Commit messages](#commit-messages).
 CFEngine is built from several different repositories.
 Sometimes a change is needed in multiple repositories.
 When possible, try to make changes compatible with the master version of the other repositories.
-While our Jenkins Pipeline can handle multiple Pull Requests, Travis does not.
+Our Jenkins and Github Actions pipelines can handle multiple Pull Requests.
+Mention the other Pull Request URLs in the description of your Pull Request.
+
+
+```
+merge together:
+https://github.com/cfengine/core/pull/1234
+https://github.com/cfengine/masterfiles/pull/4321
+```
+
 If you are making a breaking change in one repository which has to be merged together with another pull request, make this very clear.
 Put this in the pull request description (first comment);
 
