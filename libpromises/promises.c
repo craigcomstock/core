@@ -46,8 +46,10 @@ void CopyBodyConstraintsToPromise(EvalContext *ctx, Promise *pp,
     {
         Constraint *scp = SeqAt(bp->conlist, k);
 
+printf("Checking IsDefinedClass(ctx, %s)\n", scp->classes);
         if (IsDefinedClass(ctx, scp->classes))
         {
+printf("CRAIG: scp->classes(%s) is defined, so expand/include attributes?\n", scp->classes);
             Rval returnval = ExpandPrivateRval(ctx, NULL, "body",
                                                scp->rval.item, scp->rval.type);
             PromiseAppendConstraint(pp, scp->lval, returnval, false);

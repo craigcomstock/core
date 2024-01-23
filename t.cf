@@ -1,0 +1,27 @@
+body file control
+{
+  inputs => { "/Users/craig/cfe/masterfiles/lib/stdlib.cf" };
+}
+#body common control
+#{
+#  package_module => $(package_module_knowledge.platform_default);
+#}
+bundle agent main
+{
+#  reports:
+#    "the file contains: " printfile => dog;
+  packages:
+    "lynx";
+#  reports:
+#    "package_module_knowledge.platform_default is $(package_module_knowledge.platform_default)";
+}
+
+#body printfile dog()
+#{
+#  inherit_from => cat2("/Users/craig/test.txt");
+#}
+#body printfile cat2(file)
+#{
+#  file_to_print => "$(file)";
+#  number_of_lines => "inf";
+#}

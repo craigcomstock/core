@@ -2750,6 +2750,7 @@ void EvalContextAppendBodyParentsAndArgs(const EvalContext *ctx, const Policy *p
                                          Seq* chain, const Body *bp, const char *callee_type,
                                          int depth)
 {
+printf("CRAIG looking at bp->name = '%s'\n", bp->name);
     if (depth > 30) // sanity check
     {
         Log(LOG_LEVEL_ERR, "EvalContextAppendBodyParentsAndArgs: body inheritance chain depth %d in body %s is too much, aborting", depth, bp->name);
@@ -2773,6 +2774,7 @@ void EvalContextAppendBodyParentsAndArgs(const EvalContext *ctx, const Policy *p
             }
 
             ClassRef parent_ref = IDRefQualify(ctx, call);
+printf("CRAIG, %s has inherit_from => %s\n", bp->name, parent_ref.name);
 
             // We don't do a more detailed check for circular
             // inheritance because the depth check above will catch it
@@ -2785,6 +2787,7 @@ void EvalContextAppendBodyParentsAndArgs(const EvalContext *ctx, const Policy *p
             const Body *parent = EvalContextFindFirstMatchingBody(policy, callee_type, parent_ref.ns, parent_ref.name);
             if (parent)
             {
+printf("CRAIG found parent with name='%s' to append constraints from\n", parent->name);
                 SeqAppend(chain, (void *)parent);
                 SeqAppend(chain, &(scp->rval));
                 EvalContextAppendBodyParentsAndArgs(ctx, policy, chain, parent, callee_type, depth+1);
@@ -2803,6 +2806,7 @@ Seq *EvalContextResolveBodyExpression(const EvalContext *ctx, const Policy *poli
     const Body *bp = EvalContextFindFirstMatchingBody(policy, callee_type, ref.ns, ref.name);
     if (bp)
     {
+printf("CRAIG, bound first body as %s\n", bp->name);
         bodies = SeqNew(2, NULL);
         SeqAppend(bodies, (void *)bp);
         SeqAppend(bodies, (void *)NULL);

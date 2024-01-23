@@ -60,6 +60,7 @@ static const ConstraintSyntax package_method_constraints[] =
     ConstraintSyntaxNewBool("package_commands_useshell", "Whether to use shell for commands in this body. Default value: true", SYNTAX_STATUS_NORMAL),
     ConstraintSyntaxNewString("package_version_less_command", CF_PATHRANGE, "Command to check whether first supplied package version is less than second one", SYNTAX_STATUS_NORMAL),
     ConstraintSyntaxNewString("package_version_equal_command", CF_PATHRANGE, "Command to check whether first supplied package version is equal to second one", SYNTAX_STATUS_NORMAL),
+    ConstraintSyntaxNewString("package_method_implementation", CF_PATHRANGE, "Name of package_method to use as implementation. Intended primarily for package_method generic.", SYNTAX_STATUS_NORMAL),
     ConstraintSyntaxNewNull()
 };
 
