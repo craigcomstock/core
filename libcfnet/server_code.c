@@ -115,7 +115,7 @@ static int OpenReceiverChannel(char *bind_address)
     struct addrinfo *response = NULL, *ap;
     struct addrinfo query = {
         .ai_flags = AI_PASSIVE,
-        .ai_family = AF_UNSPEC,
+        .ai_family = AF_INET,
         .ai_socktype = SOCK_STREAM
     };
 
@@ -167,6 +167,7 @@ static int OpenReceiverChannel(char *bind_address)
     for (ap = response; ap != NULL; ap = ap->ai_next)
     {
         sd = socket(ap->ai_family, ap->ai_socktype, ap->ai_protocol);
+Log(LOG_LEVEL_INFO,"CRAIG got socket sd %d, family type %d, AF_INET=%d, AF_INET6=%d", sd, ap->ai_family, AF_INET, AF_INET6);
         if (sd == -1)
         {
             if (ap->ai_family == AF_INET)
