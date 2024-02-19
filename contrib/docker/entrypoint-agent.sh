@@ -14,8 +14,14 @@ mount --make-slave /chroot/run
 for i in bin lib lib64 sbin; do cp -a /rootfs/$i /chroot/; done # for the POC it's hardcoded for Amazon Linux for now
 for i in $(ls -1 /rootfs/ | grep -v -E "bin|dev|lib|lib64|proc|run|sbin|sys"); do mkdir /chroot/$i && mount -o bind /rootfs/$i /chroot/$i; done
 
-# TODO, check /chroot/etc/os-release and download an appropriate package of cfengine enterprise agent :)
 # CFENGINE_HUB_IP should be provided as an ENV var from the docker run command
+
+# yocto wacky hacky way of installing
+
+cd /chroot/var
+tar xf /dunfell-cfengine-nova.tar.gz 
+cd /chroot/var/cfengine
+tar xf /liblmdb.tar.gz 
 
 # entrypoint script for installing and running the agent to be executed from chroot jail
 cat > /chroot/entry.sh << EOF
@@ -23,18 +29,22 @@ cat > /chroot/entry.sh << EOF
 
 set -x
 
-sudo apt install dnsutils
-cat /etc/resolv.conf
-dig s3.amazonaws.com
-cd /tmp
-# this is a little bit dirty because it's executed in chroot and in fact installed on the host OS instead of a container
-# in a good way would be to mount it from a container to the chroot, but managing different OSs is significant amount of work
-# which is out of scope for the POC
-if [ ! -f /var/cfengine/bin/cf-agent ]; then
-    curl -O https://s3.amazonaws.com/cfengine.packages/quick-install-cfengine-enterprise.sh && bash ./quick-install-cfengine-enterprise.sh agent
-fi
+#sudo apt install dnsutils
+#cat /etc/resolv.conf
+#dig s3.amazonaws.com
+#cd /tmp
+## this is a little bit dirty because it's executed in chroot and in fact installed on the host OS instead of a container
+## in a good way would be to mount it from a container to the chroot, but managing different OSs is significant amount of work
+## which is out of scope for the POC
+#if [ ! -f /var/cfengine/bin/cf-agent ]; then
+#    curl -O https://s3.amazonaws.com/cfengine.packages/quick-install-cfengine-enterprise.sh && bash ./quick-install-cfengine-enterprise.sh agent
+#fi
 
+/var/cfengine/bin/cf-key
 /var/cfengine/bin/cf-agent --bootstrap ${CFENGINE_HUB_IP} --log-level info
+/var/cfengine/bin/cf-agent -KIf update.cf
+/var/cfengine/bin/cf-agent -KI
+/var/cfengine/bin/cf-agent -KI
 
 # TODO: to manage this properly we probably need to use 'init' container to install the agent and then run
 #       the daemons in separate containers within a pod for the livecycle management by Kubernetes
@@ -49,4 +59,5 @@ while true; do sleep 3600; done
 EOF
 chmod +x /chroot/entry.sh
 
+#chroot /chroot/ /bin/bash
 chroot /chroot/ /entry.sh

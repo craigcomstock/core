@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 set -ex
-COMPUTED_ROOT="$(readlink -e "$(dirname "$0")/../../../../")"
-# NTECH_ROOT should be the same, but if available use it so user can do their own thing.
-NTECH_ROOT=${NTECH_ROOT:-$COMPUTED_ROOT}
-PWD="${NTECH_ROOT}/core/contrib/docker"
+test ! -d /var/cfengine
+#COMPUTED_ROOT="$(readlink -e "$(dirname "$0")/../../../../")"
+## NTECH_ROOT should be the same, but if available use it so user can do their own thing.
+#NTECH_ROOT=${NTECH_ROOT:-$COMPUTED_ROOT}
+#PWD="${NTECH_ROOT}/core/contrib/docker"
+PWD=$(pwd)
 
 name=cfengine-chroot-agent
 docker build -t "$name" -f "${PWD}/Dockerfile-cfengine-chroot-agent" "${PWD}"
+CFENGINE_HUB_IP=192.168.1.196
+export CFENGINE_HUB_IP
 docker run -d --env CFENGINE_HUB_IP --privileged \
   -v "/:/rootfs" \
   -v "/proc:/rootproc" \
@@ -15,3 +19,4 @@ docker run -d --env CFENGINE_HUB_IP --privileged \
   -v "/run:/rootrun" \
   --name "$name" \
   "$name"
+#docker exec -it cfengine-chroot-agent bash

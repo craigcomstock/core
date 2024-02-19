@@ -1,11 +1,16 @@
 #+caption: Dockerfile for CFEngine Enterprise Agent
 #+begin_src
-FROM debian:12
+FROM debian:11
 RUN apt-get update && \
-    apt-get install -y curl wget ed locales docker.io 
+    apt-get install -y ed locales
+# docker.io package? no, just use what is in chroot aka torizon-core/yocto
+ 
 # Set the locale
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
     locale-gen
+COPY ./dunfell-cfengine-nova.tar.gz /
+COPY ./liblmdb.tar.gz /
 COPY ./entrypoint-agent.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
+#CMD sleep infinity
 #+end_src
