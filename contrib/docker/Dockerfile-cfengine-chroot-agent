@@ -1,0 +1,11 @@
+#+caption: Dockerfile for CFEngine Enterprise Agent
+#+begin_src
+FROM debian:12
+RUN apt-get update && \
+    apt-get install -y curl wget ed locales docker.io 
+# Set the locale
+RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
+    locale-gen
+COPY ./entrypoint-agent.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+#+end_src
