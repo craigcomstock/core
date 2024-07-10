@@ -98,7 +98,7 @@ git_deploy_refspec() {
   # Put staging dir right next to deploy dir to ensure it's on same filesystem
   local temp_stage
   temp_stage="$(mktemp -d --tmpdir="$(dirname "$1")" )"
-  trap 'rm -rf "$temp_stage"' EXIT
+  trap "rm -rf \"$temp_stage\"" EXIT
 
   ########################## 2. CHECKOUT INTO TEMP DIR
   # The '^0' at the end of the refspec
@@ -140,7 +140,7 @@ git_deploy_refspec() {
     fi
     local third_dir
     third_dir="$(mktemp -d --tmpdir="$(dirname "$1")" )"
-    trap 'rm -rf "$third_dir"' EXIT
+    trap "rm -rf \"$third_dir\"" EXIT
     mv "${1}" "${third_dir}"  || error_exit "Can't mv ${1} to ${third_dir}"
       # If the above command fails we will have an extra temp dir left.  Otherwise not.
     mv "${temp_stage}" "${1}"          || error_exit "Can't mv ${temp_stage} to ${1}"
@@ -215,7 +215,7 @@ git_cfbs_deploy_refspec() {
   # Put staging dir right next to deploy dir to ensure it's on same filesystem
   local temp_stage
   temp_stage="$(mktemp -d --tmpdir="$(dirname "$1")" )"
-  trap 'rm -rf "$temp_stage"' EXIT
+  trap "rm -rf \"$temp_stage\"" EXIT
 
   ########################## 2. CHECKOUT INTO TEMP DIR
   # The '^0' at the end of the refspec
@@ -266,7 +266,7 @@ git_cfbs_deploy_refspec() {
     fi
     local third_dir
     third_dir="$(mktemp -d --tmpdir="$(dirname "$1")" )"
-    trap 'rm -rf "$third_dir"' EXIT
+    trap "rm -rf \"$third_dir\"" EXIT
     mv "${1}" "${third_dir}"  || error_exit "Can't mv ${1} to ${third_dir}"
       # If the above command fails we will have an extra temp dir left.  Otherwise not.
     mv "${temp_stage}/out/masterfiles" "${1}"          || error_exit "Can't mv ${temp_stage}/out/masterfiles to ${1}"
