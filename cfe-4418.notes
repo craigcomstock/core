@@ -1,0 +1,19 @@
+Fri Jul 19 06:51:46 CDT 2024
+   debug: Evaluating function: string_split("$(packages_to_uninstall)",",","100")
+   debug: Evaluating vars promise: _packages_to_uninstall_unfiltered
+   debug: DeRefCopyPromise(): promiser:'_packages_to_uninstall'
+   debug: DeRefCopyPromise():     copying constraint: 'slist'
+   debug: Evaluating function: difference("_packages_to_uninstall_unfiltered","_packa
+ges_to_install")
+   debug: Evaluating vars promise: _packages_to_uninstall
+   debug: DeRefCopyPromise(): promiser:'$(_packages_to_uninstall)'
+   debug: DeRefCopyPromise():     copying constraint: 'policy'
+   debug: Starting iteration engine with 1 wheels   ---   ENTERING WARP SPEED
+ verbose: Package promise had no package_method attibute and policy had no 'generic'
+package_method body so will use v2 package modules.
+ verbose: Using v2 package promises (package_module)
+   debug: New package promise handler
+   error: Can not find package module body in policy.
+   error: New package promise failed sanity check.
+ verbose: A: Promise NOT KEPT!
+ verbose: P: END packages promise (talk)

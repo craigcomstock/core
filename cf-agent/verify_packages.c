@@ -170,6 +170,7 @@ static PackagePromiseType GetPackagePromiseVersion(const Packages *packages,
         //TODO:
         if (!packages->has_package_method)
         {
+            Log(LOG_LEVEL_ERR, "No package_method is specified or no package_method 'generic' is available as in the case of masterfiles standard library. Use verbose or debug logging for more details.");
             return PACKAGE_PROMISE_TYPE_OLD_ERROR;
         }
         return PACKAGE_PROMISE_TYPE_OLD;

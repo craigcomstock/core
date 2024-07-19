@@ -35,7 +35,7 @@ static bool NewPackagePromiseSanityCheck(const Attributes *a)
     assert(a != NULL);
     if (!a->new_packages.module_body || !a->new_packages.module_body->name)
     {
-        Log(LOG_LEVEL_ERR, "Can not find package module body in policy.");
+        Log(LOG_LEVEL_VERBOSE, "Can not find package module body in policy.");
         return false;
     }
 
