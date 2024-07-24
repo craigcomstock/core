@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    deprecated.daemonset.template.generation: "1"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"DaemonSet","metadata":{"annotations":{},"labels":{"app":"agent"},"name":"cfengine-agent","namespace":"cfengine"},"spec":{"selector":{"matchLabels":{"name":"cfengine-agent"}},"template":{"metadata":{"labels":{"name":"cfengine-agent"}},"spec":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"kubernetes.io/arch","operator":"In","values":["amd64"]}]}]}}},"containers":[{"image":"localhost:5000/cfengine-agent:latest","imagePullPolicy":"Always","name":"agent","resources":{"limits":{"memory":"200Mi"},"requests":{"cpu":"50m","memory":"200Mi"}},"securityContext":{"allowPrivilegeEscalation":true,"privileged":true,"runAsGroup":0,"runAsUser":0},"volumeMounts":[{"mountPath":"/rootfs","name":"rootfs","readOnly":false},{"mountPath":"/rootsys","name":"sys","readOnly":false},{"mountPath":"/rootproc","name":"proc","readOnly":false},{"mountPath":"/rootdev","name":"dev","readOnly":false},{"mountPath":"/rootrun","name":"run","readOnly":false}]}],"hostNetwork":true,"hostPID":true,"volumes":[{"hostPath":{"path":"/"},"name":"rootfs"},{"hostPath":{"path":"/proc"},"name":"proc"},{"hostPath":{"path":"/sys"},"name":"sys"},{"hostPath":{"path":"/dev"},"name":"dev"},{"hostPath":{"path":"/run"},"name":"run"}]}}}}
+  creationTimestamp: "2023-12-21T17:55:48Z"
+  generation: 1
+  labels:
+    app: agent
+  name: cfengine-agent
+  namespace: cfengine
+  resourceVersion: "23126"
+  uid: a6aeb347-1b2e-42ba-80c5-257c5ab70bf2
+spec:
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: cfengine-agent
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        name: cfengine-agent
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/arch
+                operator: In
+                values:
+                - amd64
+      containers:
+      - image: localhost:5000/cfengine-agent:latest
+        imagePullPolicy: Always
+        name: agent
+        resources:
+          limits:
+            memory: 200Mi
+          requests:
+            cpu: 50m
+            memory: 200Mi
+        securityContext:
+          allowPrivilegeEscalation: true
+          privileged: true
+          runAsGroup: 0
+          runAsUser: 0
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /rootfs
+          name: rootfs
+        - mountPath: /rootsys
+          name: sys
+        - mountPath: /rootproc
+          name: proc
+        - mountPath: /rootdev
+          name: dev
+        - mountPath: /rootrun
+          name: run
+      dnsPolicy: ClusterFirst
+      hostNetwork: true
+      hostPID: true
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - hostPath:
+          path: /
+          type: ""
+        name: rootfs
+      - hostPath:
+          path: /proc
+          type: ""
+        name: proc
+      - hostPath:
+          path: /sys
+          type: ""
+        name: sys
+      - hostPath:
+          path: /dev
+          type: ""
+        name: dev
+      - hostPath:
+          path: /run
+          type: ""
+        name: run
+  updateStrategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
+status:
+  currentNumberScheduled: 1
+  desiredNumberScheduled: 1
+  numberAvailable: 1
+  numberMisscheduled: 0
+  numberReady: 1
+  observedGeneration: 1
+  updatedNumberScheduled: 1

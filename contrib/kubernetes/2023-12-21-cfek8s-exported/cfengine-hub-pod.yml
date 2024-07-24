@@ -1,0 +1,125 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2023-12-21T17:46:27Z"
+  generateName: cfengine-hub-
+  labels:
+    app: cfengine-hub
+    apps.kubernetes.io/pod-index: "0"
+    controller-revision-hash: cfengine-hub-5c5544cfb7
+    statefulset.kubernetes.io/pod-name: cfengine-hub-0
+  name: cfengine-hub-0
+  namespace: cfengine
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: StatefulSet
+    name: cfengine-hub
+    uid: 58568124-b4a2-4326-ad85-b88b4d4f8a1a
+  resourceVersion: "22195"
+  uid: 9b2c3b48-f684-417a-9140-da1e3bc29b56
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/arch
+            operator: In
+            values:
+            - amd64
+  containers:
+  - image: localhost:5000/cfengine-server:latest
+    imagePullPolicy: Always
+    name: hub
+    ports:
+    - containerPort: 443
+      protocol: TCP
+    - containerPort: 80
+      protocol: TCP
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-mm68h
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  hostname: cfengine-hub-0
+  nodeName: librem15
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  subdomain: cfengine-hub
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: kube-api-access-mm68h
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2023-12-21T17:46:27Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2023-12-21T17:46:29Z"
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2023-12-21T17:46:29Z"
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2023-12-21T17:46:27Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: containerd://d9048286a1a41a332bcc2bed7732e5dbd161a2547c802b977bbf3d713d932475
+    image: localhost:5000/cfengine-server:latest
+    imageID: localhost:5000/cfengine-server@sha256:bfb975979e53fcde9a2ce64de11926bd4251a6bdde81000ec1d9d9dc90c5885c
+    lastState: {}
+    name: hub
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2023-12-21T17:46:29Z"
+  hostIP: 192.168.1.238
+  phase: Running
+  podIP: 10.42.0.127
+  podIPs:
+  - ip: 10.42.0.127
+  qosClass: BestEffort
+  startTime: "2023-12-21T17:46:27Z"

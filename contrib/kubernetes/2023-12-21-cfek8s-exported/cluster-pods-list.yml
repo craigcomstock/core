@@ -1,0 +1,18 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"ClusterRole","metadata":{"annotations":{},"name":"cluster-pods-list"},"rules":[{"apiGroups":[""],"resources":["pods"],"verbs":["list","get"]}]}
+  creationTimestamp: "2023-12-21T20:03:10Z"
+  name: cluster-pods-list
+  resourceVersion: "26795"
+  uid: 98345ea5-3fae-4dd0-af70-e1821ca2cf95
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - list
+  - get

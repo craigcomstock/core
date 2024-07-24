@@ -1,0 +1,8 @@
+# The primary network interface
+# likely your "app" will need this interface for it's service on ports 80/443
+allow-hotplug enx00051b946298
+iface enx00051b946298 inet dhcp
+
+# Add an extra IP address on the main interface for cfengine-hub
+iface enx00051b946298 inet static
+address 192.168.1.239/24

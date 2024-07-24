@@ -1,0 +1,8 @@
+set -e
+set -x
+#docker build -f Dockerfile-cfengine-enterprise-hub -t localhost:5000/cfengine-server:latest .
+#docker push localhost:5000/cfengine-server:latest
+#docker build -f Dockerfile-cfengine-enterprise-agent -t localhost:5000/cfengine-agent:latest .
+#docker push localhost:5000/cfengine-agent:latest
+#kubectl --namespace cfengine delete pod cfengine-hub-0
+kubectl apply -f server-statefulset.yml

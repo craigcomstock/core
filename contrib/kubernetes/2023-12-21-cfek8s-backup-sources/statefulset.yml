@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cfengine-hub
+  namespace: cfengine
+spec:
+  selector:
+    matchLabels:
+      app: cfengine-hub
+  serviceName: "cfengine-hub"
+  replicas: 1
+  minReadySeconds: 10
+  template:
+    metadata:
+      labels:
+        app: cfengine-hub
+    spec:
+      terminationGracePeriodSeconds: 30
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/arch
+                operator: In
+                values:
+                  - amd64
+      containers:
+      - name: hub
+        image: localhost:5000/cfengine-server:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 443
+        - containerPort: 80
+# TODO: volumeMounts for /var/cfengine/state/pg for data persistency
+

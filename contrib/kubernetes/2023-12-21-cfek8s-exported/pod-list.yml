@@ -1,0 +1,19 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"Role","metadata":{"annotations":{},"name":"pods-list","namespace":"cfengine"},"rules":[{"apiGroups":[""],"resources":["pods"],"verbs":["list","get"]}]}
+  creationTimestamp: "2023-12-21T17:06:09Z"
+  name: pods-list
+  namespace: cfengine
+  resourceVersion: "20652"
+  uid: f6cf79f2-665c-4464-8332-eef2beac5e99
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - list
+  - get

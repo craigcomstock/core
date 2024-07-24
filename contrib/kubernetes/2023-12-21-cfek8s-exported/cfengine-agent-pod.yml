@@ -1,0 +1,179 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2023-12-21T17:55:48Z"
+  generateName: cfengine-agent-
+  labels:
+    controller-revision-hash: 5bb9cf775f
+    name: cfengine-agent
+    pod-template-generation: "1"
+  name: cfengine-agent-qrc5s
+  namespace: cfengine
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: DaemonSet
+    name: cfengine-agent
+    uid: a6aeb347-1b2e-42ba-80c5-257c5ab70bf2
+  resourceVersion: "23124"
+  uid: 976e236b-34eb-454b-bc46-66ec6091ba88
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchFields:
+          - key: metadata.name
+            operator: In
+            values:
+            - librem15
+  containers:
+  - image: localhost:5000/cfengine-agent:latest
+    imagePullPolicy: Always
+    name: agent
+    resources:
+      limits:
+        memory: 200Mi
+      requests:
+        cpu: 50m
+        memory: 200Mi
+    securityContext:
+      allowPrivilegeEscalation: true
+      privileged: true
+      runAsGroup: 0
+      runAsUser: 0
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /rootfs
+      name: rootfs
+    - mountPath: /rootsys
+      name: sys
+    - mountPath: /rootproc
+      name: proc
+    - mountPath: /rootdev
+      name: dev
+    - mountPath: /rootrun
+      name: run
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-tzlg4
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  hostNetwork: true
+  hostPID: true
+  nodeName: librem15
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+  - effect: NoSchedule
+    key: node.kubernetes.io/disk-pressure
+    operator: Exists
+  - effect: NoSchedule
+    key: node.kubernetes.io/memory-pressure
+    operator: Exists
+  - effect: NoSchedule
+    key: node.kubernetes.io/pid-pressure
+    operator: Exists
+  - effect: NoSchedule
+    key: node.kubernetes.io/unschedulable
+    operator: Exists
+  - effect: NoSchedule
+    key: node.kubernetes.io/network-unavailable
+    operator: Exists
+  volumes:
+  - hostPath:
+      path: /
+      type: ""
+    name: rootfs
+  - hostPath:
+      path: /proc
+      type: ""
+    name: proc
+  - hostPath:
+      path: /sys
+      type: ""
+    name: sys
+  - hostPath:
+      path: /dev
+      type: ""
+    name: dev
+  - hostPath:
+      path: /run
+      type: ""
+    name: run
+  - name: kube-api-access-tzlg4
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2023-12-21T17:55:48Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2023-12-21T18:12:01Z"
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2023-12-21T18:12:01Z"
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2023-12-21T17:55:48Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: containerd://837e1bea6eafbc9325c5b7953656c24da9366c872f98ad0407474c74efa5473e
+    image: localhost:5000/cfengine-agent:latest
+    imageID: localhost:5000/cfengine-agent@sha256:1dee3e4baf57473a32952b434f523599bba022d6afd8ee57662b58f966fe429c
+    lastState:
+      terminated:
+        containerID: containerd://8cef758ad7d32a59554b63572a5e24455497441015950f89b604998e7a62a10a
+        exitCode: 0
+        finishedAt: "2023-12-21T18:06:52Z"
+        reason: Completed
+        startedAt: "2023-12-21T18:06:52Z"
+    name: agent
+    ready: true
+    restartCount: 8
+    started: true
+    state:
+      running:
+        startedAt: "2023-12-21T18:12:00Z"
+  hostIP: 192.168.1.238
+  phase: Running
+  podIP: 192.168.1.238
+  podIPs:
+  - ip: 192.168.1.238
+  - ip: fdeb:8c4f:f55e:0:205:1bff:fe94:6298
+  qosClass: Burstable
+  startTime: "2023-12-21T17:55:48Z"
