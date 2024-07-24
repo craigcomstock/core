@@ -1,0 +1,5 @@
+FROM ubuntu:20.04
+RUN apt-get update && apt-get install -q -y systemd wget sudo
+ADD https://s3.amazonaws.com/cfengine.packages/quick-install-cfengine-enterprise.sh /
+RUN bash /quick-install-cfengine-enterprise.sh agent
+CMD [ "/lib/systemd/systemd" ]

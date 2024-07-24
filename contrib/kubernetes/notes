@@ -1,0 +1,28 @@
+Thu Dec 21 20:04:15 CST 2023
+got this working on librem15 laptop deb12
+now macos docker desktop with minikube?
+
+Craigs-MacBook-Pro.local ? minikube addons enable registry
+💡  registry is an addon maintained by Google. For any concerns contact minikube on GitHub.
+You can view the list of minikube maintainers at: https://github.com/kubernetes/minikube/blob/master/OWNERS
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│                                                                                                      │
+│    Registry addon with docker driver uses port 49502 please use that instead of default port 5000    │
+│                                                                                                      │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────╯
+📘  For more information see: https://minikube.sigs.k8s.io/docs/drivers/docker
+    ▪ Using image docker.io/registry:2.8.1
+    ▪ Using image gcr.io/google_containers/kube-registry-proxy:0.4
+🔎  Verifying registry addon...
+🌟  The 'registry' addon is enabled
+
+
+Fri Dec 22 14:29:06 CST 2023
+random port every time, this time 52691
+
+    1. Run "docker system prune" to remove unused Docker data (optionally with "-a")
+    2. Increase the storage allocated to Docker for Desktop by clicking on:
+    Docker icon > Preferences > Resources > Disk Image Size
+    3. Run "minikube ssh -- docker system prune" if using the Docker container runtime
+🍿  Related issue: https://github.com/kubernetes/minikube/issues/9024
+

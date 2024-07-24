@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cfengine-agent
+  namespace: cfengine
+  labels:
+    app: agent
+spec:
+  selector:
+    matchLabels:
+      name: cfengine-agent
+  template:
+    metadata:
+      labels:
+        name: cfengine-agent
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/arch
+                operator: In
+                values:
+                  - amd64
+      containers:
+        - name: agent
+          image: localhost:5000/cfengine-agent:latest
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: 200Mi
+            requests:
+              cpu: 50m
+              memory: 200Mi
+          securityContext:
+            privileged: true
+            allowPrivilegeEscalation: true
+            runAsUser: 0
+            runAsGroup: 0
+          volumeMounts:
+            - name: rootfs
+              mountPath: /rootfs
+              readOnly: false
+            - name: sys
+              mountPath: /rootsys
+              readOnly: false
+            - name: proc
+              mountPath: /rootproc
+              readOnly: false
+            - name: dev
+              mountPath: /rootdev
+              readOnly: false
+            - name: run
+              mountPath: /rootrun
+              readOnly: false
+      hostNetwork: true
+      hostPID: true
+      volumes:
+        - name: rootfs
+          hostPath:
+            path: /
+        - name: proc
+          hostPath:
+            path: /proc
+        - name: sys
+          hostPath:
+            path: /sys
+        - name: dev
+          hostPath:
+            path: /dev
+        - name: run
+          hostPath:
+            path: /run

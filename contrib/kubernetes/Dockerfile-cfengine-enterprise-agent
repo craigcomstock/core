@@ -1,0 +1,16 @@
+#+caption: Dockerfile for CFEngine Enterprise Agent
+#+begin_src
+FROM ubuntu:22.04
+RUN apt-get update && \
+    apt-get install -y curl wget ed locales && \
+    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && \
+    curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256" && \
+    echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check && \
+    install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl && \
+    rm -f kubectl kubectl.sha256
+# Set the locale
+RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
+    locale-gen
+COPY ./entrypoint-agent.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+#+end_src
