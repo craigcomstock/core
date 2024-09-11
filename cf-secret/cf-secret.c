@@ -343,7 +343,7 @@ static bool RSAEncrypt(Seq *rsa_keys, const char *input_path, const char *output
 
     const EVP_CIPHER *cipher = EVP_aes_256_cbc();
     EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
-    const int key_size = EVP_PKEY_size((EVP_PKEY*) SeqAt(evp_keys, 0));
+    const int key_size = EVP_PKEY_get_size((EVP_PKEY*) SeqAt(evp_keys, 0));
 
     /* This sequence and the 'enc_key_sizes' array are both populated by the
      * EVP_SealInit() call below. */
@@ -354,10 +354,10 @@ static bool RSAEncrypt(Seq *rsa_keys, const char *input_path, const char *output
     }
     int enc_key_sizes[n_keys];
 
-    const int iv_size = EVP_CIPHER_iv_length(cipher);
+    const int iv_size = EVP_CIPHER_get_iv_length(cipher);
     unsigned char iv[iv_size];
 
-    const int block_size = EVP_CIPHER_block_size(cipher);
+    const int block_size = EVP_CIPHER_get_block_size(cipher);
     char plaintext[block_size], ciphertext[2 * block_size];
     int ct_len;
 
@@ -701,7 +701,7 @@ static bool RSADecrypt(RSA *privkey, const char *input_path, const char *output_
     const int iv_size = EVP_CIPHER_iv_length(cipher);
     unsigned char iv[iv_size];
 
-    const int key_size = EVP_PKEY_size(evp_key);
+    const int key_size = EVP_PKEY_get_size(evp_key);
     unsigned char ek[key_size];
     unsigned char dev_null[key_size];
 

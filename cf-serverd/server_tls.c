@@ -88,7 +88,7 @@ bool ServerTLSInitialize(RSA *priv_key, RSA *pub_key, SSL_CTX **ssl_ctx)
         ssl_ctx = &SSLSERVERCONTEXT;
     }
     assert(*ssl_ctx == NULL);
-    *ssl_ctx = SSL_CTX_new(SSLv23_server_method());
+    *ssl_ctx = SSL_CTX_new(TLS_server_method());
     if (*ssl_ctx == NULL)
     {
         Log(LOG_LEVEL_ERR, "SSL_CTX_new: %s",

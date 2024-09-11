@@ -94,7 +94,7 @@ bool TLSClientInitialize(const char *tls_min_version,
         return false;
     }
 
-    SSLCLIENTCONTEXT = SSL_CTX_new(SSLv23_client_method());
+    SSLCLIENTCONTEXT = SSL_CTX_new(TLS_client_method());
     if (SSLCLIENTCONTEXT == NULL)
     {
         Log(LOG_LEVEL_ERR, "SSL_CTX_new: %s",
