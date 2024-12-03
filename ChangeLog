@@ -1,3 +1,5 @@
+3.24.2:
+
 3.24.1:
 	- Added logging CFEngine component related SELinux denials in cf-support
 	  (ENT-12137)
