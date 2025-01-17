@@ -1,3 +1,11 @@
+3.21.7:
+	- Adjusted cf-support for exotic UNIX platforms (ENT-9786)
+	- Adjusted cf-support to not fail if core dumps are available and gdb is missing
+	  (ENT-9786)
+	- Made cf-support use coredumpctl for core analysis only when configured in kerenl.core_pattern
+	  (ENT-9985)
+	- SELinux: Allow cf-serverd to set its own limits (ENT-12446)
+
 3.21.6:
 	- Fixed multiple issues in cfengine-enterprise SELinux policy which could
 	  cause AVC denials / warnings for various CFEngine components.
