@@ -1,3 +1,28 @@
+3.26.0:
+	- 'cf-net connect' now exits with 1 in case of error (CFE-4414)
+	- Add feature class for libpam (CFE-3371)
+	- Add hardclasses for log levels notice, warning and error (CFE-4126)
+	- Add policy variable sys.cpusockets (CFE-30)
+	- Added a new policy function to get the list of metatags of a bundle, in the same manner as getclassmetatags and getvariablemetatags.
+	  Ticket: (CFE-4019)
+	- Added an optional parameter strict for validjson and
+	  validdata policy functions. This makes the functions evaluate to false on json primitives.
+	  Ticket: (CFE-4163)
+	- Added is_type policy function to check type of a variable.
+	  Ticket: (CFE-3641)
+	- Added option to print rsync performance stats in cf-net
+	- Added php-fpm systemd service files to enable http2 in Mission Portal
+	  (ENT-11440)
+	- Fix file closed twice in CopyRegularFileDiskPerms (CFE-4489)
+	- Fixed bug where basis file is truncated on remote copy
+	- Introduced a new variable default:sys.cf_edition that keeps track whether cfengine is community or enterprise.
+	  (ENT-10078)
+	- Updated syntax description to include new protocol_version values
+	  (CFE-4483)
+	- Use current process ID to investigate proc filesystem to workaround in-container non-root owned symlinks
+	  (CFE-3429)
+	- getindices() now returns positional index from a list (CFE-2930)
+
 3.25.0:
 	- Added acknowledged field to lastseen DB (ENT-11838)
 	- Various SELinux fixes:
