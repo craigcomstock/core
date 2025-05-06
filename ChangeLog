@@ -1,3 +1,5 @@
+3.21.8:
+
 3.21.7:
 	- Fixed bug in parsing process_select for Windows (ENT-12751)
 	- Added "acknowledged" field to lastseen DB (ENT-11838)
