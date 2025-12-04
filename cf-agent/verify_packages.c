@@ -2163,20 +2163,20 @@ static VersionCmpResult PackageMatch(EvalContext *ctx,
    @param installed [in] whether the package is installed
    @returns whether the package operation should be scheduled
 */
-static bool WillSchedulePackageOperation(EvalContext *ctx, const Attributes *a, const Promise *pp, int matches, int installed)
+static bool WillSchedulePackageOperation(EvalContext *ctx, const Attributes *a, const Promise *pp, int available, int installed)
 {
     assert(a != NULL);
     assert(pp != NULL);
 
     PackageAction policy = a->packages.package_policy;
 
-    Log(LOG_LEVEL_DEBUG, "WillSchedulePackageOperation: on entry, action %s: package %s matches = %s, installed = %s.",
-        PackageAction2String(policy), pp->promiser, matches ? "yes" : "no", installed ? "yes" : "no");
+    Log(LOG_LEVEL_DEBUG, "WillSchedulePackageOperation: on entry, action %s: package %s available = %s, installed = %s.",
+        PackageAction2String(policy), pp->promiser, available ? "yes" : "no", installed ? "yes" : "no");
 
     switch (policy)
     {
     case PACKAGE_ACTION_DELETE:
-        if (matches && installed)
+        if (available && installed)
         {
             Log(LOG_LEVEL_VERBOSE, "WillSchedulePackageOperation: Package %s to be deleted is installed.", pp->promiser);
             return true;
@@ -2190,7 +2190,7 @@ static bool WillSchedulePackageOperation(EvalContext *ctx, const Attributes *a, 
         break;
 
     case PACKAGE_ACTION_REINSTALL:
-        if (matches && installed)
+        if (available && installed)
         {
             Log(LOG_LEVEL_VERBOSE, "WillSchedulePackageOperation: Package %s to be reinstalled is already installed.", pp->promiser);
             return true;
@@ -2204,8 +2204,9 @@ static bool WillSchedulePackageOperation(EvalContext *ctx, const Attributes *a, 
         break;
 
     default:
-        if (!matches) // why do we schedule a 'not matched' operation?
+        if (!available)
         {
+            Log(LOG_LEVEL_VERBOSE, "WillSchedulePackageOperation: Package %s is not in available packages but the legacy algorithm installs in this case.", pp->promiser);
             return true;
         }
         else if (!installed) // matches and not installed
@@ -2234,7 +2235,7 @@ static bool WillSchedulePackageOperation(EvalContext *ctx, const Attributes *a, 
    * if PackageMatch returned an error, fail the promise
    * VersionCmpResult matches = check if (name,version,arch) is installed with PackageMatch
    * if PackageMatch returned an error, fail the promise
-   * if WillSchedulePackageOperation with "matches" and "installed" passes, call SchedulePackageOp on the package
+   * if WillSchedulePackageOperation with "available" and "installed" passes, call SchedulePackageOp on the package
 
    @param ctx [in] The evaluation context
    @param a [in] the Attributes specifying how to compare
@@ -2268,21 +2269,21 @@ static PromiseResult CheckPackageState(EvalContext *ctx, const Attributes *a, co
         return result;
     }
 
-    VersionCmpResult matches = PackageMatch(ctx, name, version, arch, &a2, pp, "[available]", &result);
+    VersionCmpResult available = PackageMatch(ctx, name, version, arch, &a2, pp, "[available]", &result);
     Log(LOG_LEVEL_VERBOSE, "CheckPackageState: Available package match for (%s,%s,%s) [name,version,arch] was decisive: %s",
-        name, version, arch, matches == VERCMP_MATCH ? "MATCH" : "ERROR-OR-NOMATCH");
+        name, version, arch, available == VERCMP_MATCH ? "MATCH" : "ERROR-OR-NOMATCH");
 
-    if (matches == VERCMP_ERROR)
+    if (available == VERCMP_ERROR)
     {
         cfPS_HELPER_0ARG(ctx, LOG_LEVEL_ERR, PROMISE_RESULT_FAIL, pp, &a2, "Failure trying to compare available package versions");
         result = PromiseResultUpdate_HELPER(pp, result, PROMISE_RESULT_FAIL);
         return result;
     }
 
-    if (WillSchedulePackageOperation(ctx, &a2, pp, matches, installed))
+    if (WillSchedulePackageOperation(ctx, &a2, pp, available, installed))
     {
         Log(LOG_LEVEL_VERBOSE, "CheckPackageState: matched package (%s,%s,%s) [name,version,arch]; scheduling operation", name, version, arch);
-        return SchedulePackageOp(ctx, name, version, arch, installed, matches, no_version, a, pp);
+        return SchedulePackageOp(ctx, name, version, arch, installed, available, no_version, a, pp);
     }
 
     return result;
@@ -2294,7 +2295,7 @@ static PromiseResult CheckPackageState(EvalContext *ctx, const Attributes *a, co
    Called by VerifyPackagesPromise for the patch operation.
 
    * package name is pp->promiser
-   * installed and matches counts = 0
+   * installed and available counts = 0
    * copies a into a2 and overrides a2.packages.package_select to PACKAGE_VERSION_COMPARATOR_EQ
    * promise result starts as NOOP
    * if package version is given
@@ -2302,12 +2303,12 @@ static PromiseResult CheckPackageState(EvalContext *ctx, const Attributes *a, co
    * * * installed1 = PatchMatch(a2, name, any version "*", any architecture "*")
    * * * matches1 = PatchMatch(a2, name, requested version, arch)
    * * * if either installed1 or matches1 failed, return promise error
-   * * * else, installed += installed1; matches += matches1
+   * * * else, installed += installed1; available += matches1
    * else if package_version_regex is given
    * * assume that package_name_regex and package_arch_regex are also given and use the 3 regexes to extract name, version, arch
    * * * installed = PatchMatch(a2, matched name, any version "*", any architecture "*")
-   * * * matches = PatchMatch(a2, matched name, matched version, matched architecture)
-   * * * if either installed or matches failed, return promise error
+   * * * available = PatchMatch(a2, matched name, matched version, matched architecture)
+   * * * if either installed or available failed, return promise error
    * else (no explicit version is given) (SAME LOOP AS EXPLICIT VERSION LOOP ABOVE)
    * * no_version = true
    * * for arch = each architecture requested in a2, or (if none given) any architecture "*"
@@ -2315,8 +2316,8 @@ static PromiseResult CheckPackageState(EvalContext *ctx, const Attributes *a, co
    * * * installed1 = PatchMatch(a2, name, any version "*", any architecture "*")
    * * * matches1 = PatchMatch(a2, name, requested version '*', arch)
    * * * if either installed1 or matches1 failed, return promise error
-   * * * else, installed += installed1; matches += matches1
-   * finally, call SchedulePackageOp with the found name, version, arch, installed, matches, no_version
+   * * * else, installed += installed1; available += matches1
+   * finally, call SchedulePackageOp with the found name, version, arch, installed, available, no_version
 
    @param ctx [in] The evaluation context
    @param a [in] the Attributes specifying how to compare
@@ -2332,7 +2333,7 @@ static PromiseResult VerifyPromisedPatch(EvalContext *ctx, const Attributes *a, 
     char name[CF_MAXVARSIZE];
     char arch[CF_MAXVARSIZE];
     char *package = pp->promiser;
-    int matches = 0, installed = 0, no_version = false;
+    int available = 0, installed = 0, no_version = false;
     Rlist *rp;
 
     /* Horrible */
@@ -2361,7 +2362,7 @@ static PromiseResult VerifyPromisedPatch(EvalContext *ctx, const Attributes *a, 
             }
 
             installed += installed1;
-            matches += matches1;
+            available += matches1;
 
             if (rp == NULL) break; // Note we exit the loop explicitly here
         }
@@ -2373,9 +2374,9 @@ static PromiseResult VerifyPromisedPatch(EvalContext *ctx, const Attributes *a, 
         strlcpy(name, ExtractFirstReference(a2.packages.package_name_regex, package), CF_MAXVARSIZE);
         strlcpy(arch, ExtractFirstReference(a2.packages.package_arch_regex, package), CF_MAXVARSIZE);
         installed = PatchMatch(ctx, name, "*", "*", &a2, pp, "[installed]", &result);
-        matches = PatchMatch(ctx, name, version, arch, &a2, pp, "[available]", &result);
+        available = PatchMatch(ctx, name, version, arch, &a2, pp, "[available]", &result);
 
-        if ((installed == VERCMP_ERROR) || (matches == VERCMP_ERROR))
+        if ((installed == VERCMP_ERROR) || (available == VERCMP_ERROR))
         {
             cfPS_HELPER_0ARG(ctx, LOG_LEVEL_ERR, PROMISE_RESULT_FAIL, pp, &a2, "Failure trying to compare package versions");
             result = PromiseResultUpdate_HELPER(pp, result, PROMISE_RESULT_FAIL);
@@ -2405,16 +2406,16 @@ static PromiseResult VerifyPromisedPatch(EvalContext *ctx, const Attributes *a, 
             }
 
             installed += installed1;
-            matches += matches1;
+            available += matches1;
 
             if (rp == NULL) break; // Note we exit the loop explicitly here
         }
     }
 
     Log(LOG_LEVEL_VERBOSE, "%d patch(es) matching the name '%s' already installed", installed, name);
-    Log(LOG_LEVEL_VERBOSE, "%d patch(es) match the promise body's criteria fully", matches);
+    Log(LOG_LEVEL_VERBOSE, "%d patch(es) match the promise body's criteria fully", available);
 
-    SchedulePackageOp(ctx, name, version, arch, installed, matches, no_version, a, pp);
+    SchedulePackageOp(ctx, name, version, arch, installed, available, no_version, a, pp);
 
     return PROMISE_RESULT_NOOP;
 }
