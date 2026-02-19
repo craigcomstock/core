@@ -71,7 +71,7 @@ autoreconf -Wno-portability --force --install -I m4  ||  exit
 
 cd -  >/dev/null              # back to original directory
 
-if [ -z "$NO_CONFIGURE" ]
+if [ -z "$NO_CONFIGURE" ] || [ "$1" = "NO_CONFIGURE" ]
 then
     echo "$0: Running configure ..."
     "$srcdir"/configure --enable-maintainer-mode "$@"

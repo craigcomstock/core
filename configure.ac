@@ -29,7 +29,7 @@ dnl # Run ./autogen.sh to build configure script
 dnl #
 dnl ##########################################################################
 
-AC_PREREQ(2.63)
+AC_PREREQ([2.71])
 
 m4_define([cfversion_from_env],  m4_normalize(m4_esyscmd([echo $EXPLICIT_VERSION])))
 m4_define([cfversion_from_file], m4_normalize(m4_esyscmd([cat CFVERSION])))
@@ -46,9 +46,10 @@ m4_ifval(cfversion_from_env, [
 ])
 
 
-AC_INIT(cfengine, cfversion)
+AC_INIT([cfengine],[cfversion])
 AC_CONFIG_SRCDIR([libpromises/generic_agent.c])
 AC_CANONICAL_TARGET
+AC_CONFIG_MACRO_DIR([m4])
 
 dnl
 dnl This program needs to be checked early, as MAKEINFO variable is expanded in
@@ -100,7 +101,6 @@ AC_CONFIG_HEADERS([config.h])
 
 dnl Libtool madness
 
-AC_CONFIG_MACRO_DIR([m4])
 
 dnl
 dnl hide [s]include macros, so old aclocal (automake < 1.10) won't find them and
@@ -137,11 +137,11 @@ AS_CASE([${target_os}],
 dnl GCC specific flags
 m4_include([m4/cf3_gcc_flags.m4])
 
-# Use either new LT_INIT or old AC_DISABLE_STATIC/AC_PROG_LIBTOOL macros
+# Use either new LT_INIT or old AC_DISABLE_STATIC/LT_INIT macros
 m4_ifdef([LT_INIT],
   [LT_INIT([disable-static])],
   [AC_DISABLE_STATIC
-   AC_PROG_LIBTOOL])
+   LT_INIT])
 
 AM_PROG_LEX
 AC_PROG_YACC
@@ -174,7 +174,7 @@ if test "x$with_pthreads" != x && test "x$with_pthreads" != "xyes" && test "x$wi
    CPPFLAGS="-I$with_pthreads/include $CPPFLAGS"
 fi
 
-ACX_PTHREAD([],
+AX_PTHREAD([],
             [AC_MSG_ERROR(pthread-compatible library is required to build CFEngine)])
 
 CC="$PTHREAD_CC"
@@ -820,8 +820,16 @@ AC_CHECK_HEADERS(sys/jail.h, [], [], [AC_INCLUDES_DEFAULT
 AC_CHECK_HEADERS(net/route.h netinet/in.h netinet/ip.h)
 
 
-AC_HEADER_STDC
-AC_HEADER_TIME
+m4_warn([obsolete],
+[The preprocessor macro `STDC_HEADERS' is obsolete.
+  Except in unusual embedded environments, you can safely include all
+  ISO C90 headers unconditionally.])dnl
+# Autoupdate added the next two lines to ensure that your configure
+# script's behavior did not change.  They are probably safe to remove.
+AC_CHECK_INCLUDES_DEFAULT
+AC_PROG_EGREP
+
+
 AC_HEADER_SYS_WAIT
 AC_HEADER_DIRENT
 AC_HEADER_STDBOOL
