@@ -35,6 +35,7 @@
 #include <watcher.h>
 #include <file_watcher.h>
 #include <agent_operations.h>   // ScheduleAgentOperations()
+#include <attributes.h>
 
 /* Promise types evaluated within `bundle reactor NAME { ... }`. */
 static const char *const REACTOR_TYPESEQUENCE[] =
@@ -225,13 +226,19 @@ static PromiseResult RunThenBundle(EvalContext *ctx, const Promise *pp)
         return PROMISE_RESULT_FAIL;
     }
 
+    /* The promise lock cache makes each promise act at most once per
+     * EvalContext, but cf-reactor keeps the same EvalContext across events.
+     * Clear it so every event gets a fresh run of the bundle. */
+    EvalContextPromiseLockCacheClear(ctx);
 
     BundleBanner(bp, args);
     EvalContextSetBundleArgs(ctx, args);
     EvalContextStackPushBundleFrame(ctx, bp, args, false, NULL);
 
+    PushDefaultIfElapsed(0);
     PromiseResult result = ScheduleAgentOperations(ctx, bp);
-
+    PopDefaultIfElapsed();
+    
     EvalContextStackPopFrame(ctx);
     EvalContextSetBundleArgs(ctx, NULL);
     EndBundleBanner(bp);
