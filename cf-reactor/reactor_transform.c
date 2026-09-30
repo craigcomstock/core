@@ -50,7 +50,7 @@ static const char *const REACTOR_TYPESEQUENCE[] =
 /* Checks that the bundle referred to by an events promise's 'then' attribute,
  * either `then => "name"` or `then => name(args)`, is defined as an agent or
  * common bundle. Logs an error and returns false if it is not. */
-static bool ThenBundleExists(const EvalContext *ctx, const Promise *pp, Rval then_rval, const char *key)
+static bool ThenBundleExists(const EvalContext *ctx, const Promise *pp, Rval then_rval)
 {
     const char *bundle_name = NULL;
     switch (then_rval.type)
@@ -77,18 +77,11 @@ static bool ThenBundleExists(const EvalContext *ctx, const Promise *pp, Rval the
     if (bundle == NULL)
     {
         Log(LOG_LEVEL_ERR, "Reactor events promise '%s' refers to unknown bundle '%s', ignoring",
-            key, (bundle_name != NULL) ? bundle_name : "(invalid)");
+            pp->promiser, (bundle_name != NULL) ? bundle_name : "(invalid)");
         return false;
     }
 
     return true;
-}
-
-/* Identifies the watcher of one iteration of an events promise */
-static char *EventsPromiseKey(const Promise *pp)
-{
-    const Bundle *bp = PromiseGetBundle(pp);
-    return StringFormat("%s:%s:%s", bp->ns, bp->name, pp->promiser);
 }
 
 // Temporary limitations:
@@ -99,36 +92,30 @@ static PromiseResult KeepEventsPromise(EvalContext *ctx, const Promise *pp)
 {
     assert(pp != NULL);
 
-    char *key = EventsPromiseKey(pp);
-
     const char *path = PromiseGetConstraintAsRval(pp, "file_deleted", RVAL_TYPE_SCALAR);
     if (path == NULL)
     {
         Log(LOG_LEVEL_WARNING,
             "Reactor events promise '%s' must specify exactly one file to watch in its 'when' body, ignoring",
-            key);
-        free(key);
+            pp->promiser);
         return PROMISE_RESULT_FAIL;
     }
 
     const Constraint *then_constraint = PromiseGetConstraint(pp, "then");
     if (then_constraint == NULL)
     {
-        Log(LOG_LEVEL_ERR, "Reactor events promise '%s' does not specify a 'then' bundle, ignoring", key);
-        free(key);
+        Log(LOG_LEVEL_ERR, "Reactor events promise '%s' does not specify a 'then' bundle, ignoring", pp->promiser);
         return PROMISE_RESULT_FAIL;
     }
 
-    if (!ThenBundleExists(ctx, pp, then_constraint->rval, key))
+    if (!ThenBundleExists(ctx, pp, then_constraint->rval))
     {
-        free(key);
         return PROMISE_RESULT_FAIL;
     }
 
     // register watcher
-    Log(LOG_LEVEL_INFO, "Registering a file_deleted watcher with key '%s', on file '%s'", key, path);
-    bool kept = WatcherRegister(key, EVENT_FILE_DELETED, FileWatcherStateNew(path), pp->org_pp, 1);
-    free(key);
+    Log(LOG_LEVEL_INFO, "Registering a file_deleted watcher for events promise '%s', on file '%s'", pp->promiser, path);
+    bool kept = WatcherRegister(pp->promiser, EVENT_FILE_DELETED, FileWatcherStateNew(path), pp->org_pp, 1);
 
     return (kept) ? PROMISE_RESULT_NOOP : PROMISE_RESULT_FAIL;
 }
@@ -253,7 +240,7 @@ static PromiseResult RunThenBundle(EvalContext *ctx, const Promise *pp)
 
 typedef struct
 {
-    const char *key;
+    const char *promiser;
 } ReactorEventParam;
 
 /* Promise actuator for an events promise whose watcher fired. Only acts on
@@ -264,10 +251,7 @@ static PromiseResult KeepEventsPromiseOnEvent(EvalContext *ctx, const Promise *p
     assert(param != NULL);
     const ReactorEventParam *event = param;
 
-    char *key = EventsPromiseKey(pp);
-    const bool is_event_iteration = StringEqual(key, event->key);
-    free(key);
-    if (!is_event_iteration)
+    if (!StringEqual(pp->promiser, event->promiser))
     {
         return PROMISE_RESULT_SKIPPED;
     }
@@ -275,12 +259,12 @@ static PromiseResult KeepEventsPromiseOnEvent(EvalContext *ctx, const Promise *p
     return RunThenBundle(ctx, pp);
 }
 
-void HandleReactorEvent(EvalContext *ctx, const Promise *pp, const char *key)
+void HandleReactorEvent(EvalContext *ctx, const Promise *pp, const char *promiser)
 {
     assert(pp != NULL);
-    assert(key != NULL);
+    assert(promiser != NULL);
 
-    ReactorEventParam event = { .key = key };
+    ReactorEventParam event = { .promiser = promiser };
 
     EvalContextStackPushBundleFrame(ctx, PromiseGetBundle(pp), NULL, false, NULL);
     EvalContextStackPushBundleSectionFrame(ctx, pp->parent_section);
