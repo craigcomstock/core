@@ -39,7 +39,6 @@
 #include <rlist.h>
 #include <ornaments.h>
 #include <string_lib.h>
-#include <agent_operations.h>   // ScheduleAgentOperations()
 
 static void GetReturnValue(EvalContext *ctx, const Bundle *callee, const Promise *caller);
 
