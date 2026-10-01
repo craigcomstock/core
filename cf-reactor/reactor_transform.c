@@ -34,7 +34,6 @@
 #include <verify_vars.h>
 #include <watcher.h>
 #include <file_watcher.h>
-#include <agent_operations.h>   // ScheduleAgentOperations()
 #include <attributes.h>
 
 /* Promise types evaluated within `bundle reactor NAME { ... }`. */

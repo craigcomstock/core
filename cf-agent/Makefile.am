@@ -76,7 +76,7 @@ libcf_agent_la_SOURCES = \
 	simulate_mode.c simulate_mode.h \
 	tokyo_check.c tokyo_check.h \
 	abstract_dir.c abstract_dir.h \
-	cf-agent.c \
+	cf-agent.c cf-agent.h \
 	cf-agent-enterprise-stubs.c cf-agent-enterprise-stubs.h \
 	comparray.c comparray.h \
 	acl_posix.c acl_posix.h \
@@ -143,6 +143,7 @@ bin_PROGRAMS = cf-agent
 cf_agent_CFLAGS = $(AM_CFLAGS)
 
 # Build both a libcf-agent.la library, and a cf-agent executable
+cf_agent_SOURCES = cf-agent-main.c
 cf_agent_LDADD = libcf-agent.la
 endif
 
