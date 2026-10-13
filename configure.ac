@@ -473,11 +473,19 @@ if test $WITH_LMDB = 1; then
      && test "x$have_brew" = "xyes" && test -d $(brew --prefix lmdb)/],
     [with_lmdb=$(brew --prefix lmdb)])
 
-  CF3_WITH_LIBRARY(lmdb, [
-    AC_CHECK_LIB(lmdb, mdb_dbi_open, [], [AC_MSG_ERROR(Cannot find Lightning MDB)])
-    AC_CHECK_HEADERS(lmdb.h, [], [AC_MSG_ERROR(Cannot find Lightning MDB)])
-    AC_DEFINE(LMDB, 1, [Define if Lightning MDB is available])
-  ])
+  if test -n "$PKG_CONFIG"; then
+    if `$PKG_CONFIG --exists lmdb`; then
+      LMDB_CFLAGS=`$PKG_CONFIG --cflags lmdb`
+      LMDB_LIBS=`$PKG_CONFIG --libs lmdb`
+      LMDB_VERSION=`$PKG_CONFIG --modversion lmdb`
+    fi
+  else
+    CF3_WITH_LIBRARY(lmdb, [
+      AC_CHECK_LIB(lmdb, mdb_dbi_open, [], [AC_MSG_ERROR(Cannot find Lightning MDB)])
+      AC_CHECK_HEADERS(lmdb.h, [], [AC_MSG_ERROR(Cannot find Lightning MDB)])
+      AC_DEFINE(LMDB, 1, [Define if Lightning MDB is available])
+    ])
+  fi
 fi
 
 if test $WITH_QDBM -eq 0 && test $WITH_TOKYO -eq 0 && test $WITH_LMDB -eq 0; then
@@ -500,6 +508,14 @@ AS_IF(
   [(test "x$with_openssl" = xyes || test "x$with_openssl" = xcheck) \
    && test "x$have_brew" = "xyes" && test -d $(brew --prefix openssl)/],
   [with_openssl=$(brew --prefix openssl)])
+
+if test -n "$PKG_CONFIG"; then
+  if `$PKG_CONFIG --exists openssl`; then
+    OPENSSL_CFLAGS=`$PKG_CONFIG --cflags openssl`
+    OPENSSL_LIBS=`$PKG_CONFIG --libs openssl`
+    OPENSSL_VERSION=`$PKG_CONFIG --modversion openssl`
+  fi
+else
 
 CF3_WITH_LIBRARY(openssl, [
    AC_CHECK_LIB(crypto, RSA_generate_key_ex, [], [])
@@ -537,6 +553,8 @@ CF3_WITH_LIBRARY(openssl, [
     )
 ])
 
+fi
+
 dnl PCRE2
 
 AC_ARG_WITH([pcre2], [AS_HELP_STRING([--with-pcre2[[=PATH]]], [Specify PCRE2 path])], [], [with_pcre2=yes])
@@ -550,6 +568,14 @@ AS_IF(
     && test "x$have_brew" = "xyes" && test -d $(brew --prefix pcre2)/],
   [with_pcre2=$(brew --prefix pcre2)])
 
+if test -n "$PKG_CONFIG"; then
+  if `$PKG_CONFIG --exists pcre2`; then
+    PCRE2_CFLAGS=`$PKG_CONFIG --cflags pcre2`
+    PCRE2_LIBS=`$PKG_CONFIG --libs pcre2`
+    PCRE2_VERSION=`$PKG_CONFIG --modversion pcre2`
+  fi
+else
+
 CF3_WITH_LIBRARY(pcre2, [
   AC_CHECK_LIB(pcre2-8, pcre2_compile_8, [], [AC_MSG_ERROR(Cannot find PCRE2)])
   AC_CHECK_HEADERS(
@@ -559,6 +585,8 @@ CF3_WITH_LIBRARY(pcre2, [
     [#define PCRE2_CODE_UNIT_WIDTH 8]
   )]
 )
+
+fi
 
 dnl librsync
 
@@ -573,6 +601,9 @@ AS_IF(
    && test "x$have_brew" = "xyes" && test -d $(brew --prefix librsync)/],
   [with_librsync=$(brew --prefix librsync)])
 
+if command -v port; then
+  with_librsync=/opt/local
+fi
 CF3_WITH_LIBRARY(librsync, [
     AC_CHECK_HEADERS([librsync.h], [], AC_MSG_ERROR(Cannot find librsync))
     AC_CHECK_LIB(rsync, rs_job_iter, [], [AC_MSG_ERROR(Cannot find librsync)])
